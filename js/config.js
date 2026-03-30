@@ -4,36 +4,43 @@
 
 const CFG = {
 
-  /* ── Vehicle physics ─────────────────────────────────────── */
+  /* ── Vehicle physics (Toyota AE86 Levin/Trueno 4A-GE) ──── */
   CAR: {
-    mass:             1200,   // kg
-    inertia:          2000,   // kg·m²  (yaw moment)
-    wheelbase:        2.6,    // m
-    cgToFront:        1.1,    // m  (CG → front axle)
-    cgToRear:         1.5,    // m  (CG → rear axle)
-    cgHeight:         0.45,   // m  (CG height for weight transfer)
-    maxSteerAngle:    0.55,   // rad  (~31°)
-    steerSpeedFactor: 0.007,  // reduces steer at speed
-    frontGrip:        14.5,   // lateral stiffness
-    rearGrip:         11.5,
-    handbrakeGrip:    0.08,   // rear grip fraction when handbrake on
-    maxEngineForce:   9000,   // N
-    maxBrakeForce:    13000,  // N
-    dragCoeff:        0.42,
-    rollingResist:    110,    // N constant rolling drag
-    downforceCoeff:   0.8,    // downforce per speed² — higher = more grip at speed
-    maxSpeed:         68,     // m/s  (~245 km/h hard cap)
-    maxRPM:           8500,
-    minRPM:           800,
-    gearRatios:       [0, 3.4, 2.1, 1.45, 1.1, 0.91, 0.76],
-    finalDrive:       3.6,
-    wheelRadius:      0.32,   // m
-    length:           4.4,    // m  (rendering)
-    width:            2.0,    // m  (rendering)
-    autoShiftUp:      0.88,   // shift up at this fraction of maxRPM
-    autoShiftDown:    0.22,   // shift down at this fraction of maxRPM
-    offroadDrag:      2.8,    // extra drag multiplier when off-road
-    offroadGrip:      0.55,   // grip multiplier when off-road
+    mass:             940,    // kg
+    inertia:          1350,   // kg·m²
+    wheelbase:        2.40,   // m
+    cgToFront:        1.10,   // m (52% front bias)
+    cgToRear:         1.30,   // m
+    cgHeight:         0.44,   // m
+    trackWidth:       1.47,   // m (lateral weight transfer)
+    maxSteerAngle:    0.54,   // rad (~31°)
+    steerSpeedFactor: 0.008,
+    /* Full Pacejka params per axle: B=stiffness, C=shape, D=peak, E=curvature */
+    tireBFront: 11.0, tireCFront: 1.9, tireDFront: 1.05, tireEFront: 0.96,
+    tireBRear:  10.0, tireCRear:  1.85, tireDRear: 1.00, tireERear:  0.96,
+    handbrakeGrip:    0.06,
+    maxEngineForce:   6800,   // N
+    maxBrakeForce:    11500,  // N
+    dragCoeff:        0.36,
+    rollingResist:    80,
+    downforceCoeff:   0.3,    // AE86 minimal aero
+    maxSpeed:         52,     // m/s (~187 km/h)
+    maxRPM:           8500,   // 4A-GE redline
+    minRPM:           900,
+    gearRatios:       [0, 3.587, 2.022, 1.384, 1.000, 0.861], // 5-speed
+    finalDrive:       4.10,
+    wheelRadius:      0.295,
+    length:           4.18,
+    width:            1.85,
+    autoShiftUp:      0.87,
+    autoShiftDown:    0.24,
+    offroadDrag:      3.2,
+    offroadGrip:      0.50,
+    tireWidth:        0.22,
+    /* Tire temperature model */
+    tireTempOptimal:  85,   // °C
+    tireTempHeat:     14,   // °C/s when slipping hard
+    tireTempCool:     3.5,  // °C/s cooling
   },
 
   /* ── Nitro / Boost ───────────────────────────────────────── */
@@ -91,6 +98,22 @@ const CFG = {
     smokeLifetime:  2.0,     // s (increased)
     smokeSpeed:     3.5,     // m/s initial velocity
     sparkLifetime:  0.7,
-    speedLineThreshold: 28,  // m/s — start showing speed lines above this
+    speedLineThreshold: 24,
+    rainDrops: 200,
+  },
+
+  /* ── Environment / Weather ───────────────────────────────── */
+  ENV: {
+    timeOfDay: 'day',        // 'day' | 'dusk' | 'night'
+    weather:   'dry',        // 'dry' | 'wet' | 'rain'
+    weatherGrip: { dry: 1.0, wet: 0.82, rain: 0.62 },
+    ambientLight: {
+      day:   { sky: '#5a9bd5', ground: '#2d5a1a', roadTint: null },
+      dusk:  { sky: '#c85010', ground: '#1e1408', roadTint: 'rgba(255,80,10,0.12)' },
+      night: { sky: '#05101e', ground: '#080f06', roadTint: 'rgba(0,0,0,0.55)' },
+    },
+    rainDrops: 200,
+    rainSpeed: 440,   // px/s
+    rainAngle: 0.2,   // rad
   },
 };

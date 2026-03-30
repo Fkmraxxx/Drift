@@ -47,6 +47,7 @@
     <div class="subscreen-panel">
       <h2>CAR SETUP</h2>
       <div id="settings-grid"></div>
+      <div id="env-grid" style="margin-top:20px;"></div>
       <button id="btn-car-back" class="btn back-btn">← BACK</button>
     </div>
   </div>
@@ -124,6 +125,10 @@
 
       <!-- Near-miss indicator -->
       <div id="hud-near-miss" class="hidden">⚡ NEAR MISS!</div>
+
+      <!-- Weather & tire temp -->
+      <div id="hud-weather" class="hud-weather-dry">☀ DRY</div>
+      <div id="hud-tire-temp" class="hidden" style="position:absolute;bottom:180px;right:22px;font-family:'Rajdhani',sans-serif;font-size:clamp(10px,1.2vw,14px);letter-spacing:1px;"></div>
 
       <!-- Bottom-right: RPM gauge -->
       <div id="hud-rpm">

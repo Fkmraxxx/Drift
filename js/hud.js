@@ -117,6 +117,39 @@ const HUD = (() => {
         _els.nearMiss.classList.add('hidden');
       }
     }
+
+    /* Weather indicator */
+    const weatherEl = document.getElementById('hud-weather');
+    if (weatherEl) {
+      const w = CFG.ENV ? CFG.ENV.weather : 'dry';
+      const icons = { dry: '☀', wet: '🌧', rain: '⛈' };
+      weatherEl.textContent = (icons[w] || '') + ' ' + w.toUpperCase();
+      weatherEl.className = 'hud-weather-' + w;
+    }
+
+    /* Tire temp indicator (optional - shows hottest tire) */
+    const tireEl = document.getElementById('hud-tire-temp');
+    if (tireEl && car.tireTempRL !== undefined) {
+      const maxTemp = Math.max(car.tireTempFL, car.tireTempFR, car.tireTempRL, car.tireTempRR);
+      const optimal = CFG.CAR.tireTempOptimal || 85;
+      if (maxTemp < 40) {
+        tireEl.textContent = '🥶 COLD TYRES';
+        tireEl.style.color = '#88ccff';
+      } else if (maxTemp < optimal - 10) {
+        tireEl.textContent = `TYRES ${Math.round(maxTemp)}°C`;
+        tireEl.style.color = '#aaddff';
+      } else if (maxTemp < optimal + 20) {
+        tireEl.textContent = `TYRES ${Math.round(maxTemp)}°C ✓`;
+        tireEl.style.color = '#00ff88';
+      } else if (maxTemp < 120) {
+        tireEl.textContent = `⚠ TYRES ${Math.round(maxTemp)}°C`;
+        tireEl.style.color = '#ffaa00';
+      } else {
+        tireEl.textContent = `🔥 TYRES ${Math.round(maxTemp)}°C`;
+        tireEl.style.color = '#ff3300';
+      }
+      tireEl.classList.remove('hidden');
+    }
   }
 
   function _drawRPMGauge(canvas, rpm, norm) {

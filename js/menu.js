@@ -19,6 +19,7 @@ const MenuManager = (() => {
     _onPlay = onPlay;
     _buildTrackGrid();
     _buildSettings();
+    _buildEnvSettings();
     _bindButtons();
     _updateBestScores();
     showScreen('menu');
@@ -145,6 +146,47 @@ const MenuManager = (() => {
         if (s.key === 'sfxVol') AudioManager.setVolume(v);
       });
     });
+  }
+
+  /* ── Build ENV (weather / time of day) selectors ────────── */
+  function _buildEnvSettings() {
+    const grid = document.getElementById('env-grid');
+    if (!grid) return;
+    grid.innerHTML = '<div style="font-size:.75rem;letter-spacing:2px;opacity:.55;margin-bottom:8px;">ENVIRONMENT</div>';
+
+    const mkSelect = (label, key, options, currentVal) => {
+      const row = document.createElement('div');
+      row.className = 'setting-row';
+      const optHtml = options.map(o => `<option value="${o.v}"${o.v === currentVal ? ' selected' : ''}>${o.l}</option>`).join('');
+      row.innerHTML = `<label class="setting-label">${label}</label>
+        <div class="setting-control">
+          <select id="env-${key}" class="setting-slider" style="background:#1a1e2e;color:#fff;border:1px solid #334;padding:4px 8px;font-family:inherit;">
+            ${optHtml}
+          </select>
+        </div>`;
+      grid.appendChild(row);
+      row.querySelector('select').addEventListener('change', (e) => {
+        CFG.ENV[key] = e.target.value;
+        Storage.setSetting('env_' + key, e.target.value);
+      });
+    };
+
+    const savedTod = Storage.getSetting('env_timeOfDay') || 'day';
+    const savedWx  = Storage.getSetting('env_weather')   || 'dry';
+    if (savedTod) CFG.ENV.timeOfDay = savedTod;
+    if (savedWx)  CFG.ENV.weather   = savedWx;
+
+    mkSelect('TIME OF DAY', 'timeOfDay', [
+      { v: 'day',   l: '☀  DAY'   },
+      { v: 'dusk',  l: '🌇 DUSK'  },
+      { v: 'night', l: '🌙 NIGHT' },
+    ], savedTod);
+
+    mkSelect('WEATHER', 'weather', [
+      { v: 'dry',  l: '☀  DRY'  },
+      { v: 'wet',  l: '🌧 WET'  },
+      { v: 'rain', l: '⛈ RAIN' },
+    ], savedWx);
   }
 
   /* ── Wire up all buttons ─────────────────────────────────── */

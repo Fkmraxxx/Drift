@@ -209,6 +209,37 @@ const T3_CTRL = [
   [ 15,  50],   // 21  Approach finish
 ];
 
+/*  Track 4 — "Akina Touge"
+    Mountain pass in the style of Initial D's Akina, tight hairpins
+    downhill technical layout, ~720 m, 12 m wide */
+const T4_CTRL = [
+  [  0,   0],   //  0  Start / Finish straight
+  [ 65,  -2],   //  1
+  [130,  -8],   //  2
+  [185, -28],   //  3  Long left sweep entry
+  [225, -70],   //  4  Sweep
+  [240,-125],   //  5  Sweep exit
+  [220,-178],   //  6  First hairpin entry
+  [175,-210],   //  7  Hairpin apex
+  [115,-198],   //  8  Hairpin exit
+  [ 70,-175],   //  9
+  [ 30,-148],   // 10  Right kink
+  [ 10,-110],   // 11
+  [ 15, -68],   // 12  Second hairpin entry
+  [ 55, -38],   // 13  Hairpin apex
+  [105, -45],   // 14
+  [145, -72],   // 15  Quick right
+  [158,-108],   // 16  Third hairpin entry
+  [140,-148],   // 17  Hairpin
+  [ 98,-165],   // 18  Hairpin exit
+  [ 52,-155],   // 19  Short straight
+  [ 18,-132],   // 20  Left kink
+  [ -5, -98],   // 21  Long right sweeper
+  [-15, -58],   // 22
+  [ -8, -20],   // 23  Final corner
+  [ -2,   0],   // 24  Approach finish (closes loop)
+];
+
 /* ── Build & export ────────────────────────────────────────── */
 
 function makeTrack(id, name, ctrl, width, roadColor, accentColor, surface) {
@@ -231,4 +262,5 @@ const TRACKS = [
   makeTrack('neon',       'Neon Circuit',       T1_CTRL, 13, '#1c1c2e', '#00aaff'),
   makeTrack('industrial', 'Industrial Complex', T2_CTRL, 11, '#22201a', '#ff8800'),
   makeTrack('mountain',   'Mountain Pass',      T3_CTRL, 14, '#1a1e2a', '#cc44ff'),
+  makeTrack('akina',      'Akina Touge',        T4_CTRL, 12, '#1a1810', '#e8b020'),
 ];

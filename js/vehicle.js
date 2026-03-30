@@ -1,89 +1,72 @@
 /* ============================================================
    DRIFT KING — Vehicle Physics
-   Realistic 2-axle tire model with weight transfer, downforce,
-   nitro boost, and drift mechanics
+   Full Pacejka Magic Formula, lateral weight transfer,
+   tire temperature model, AE86 engine torque curve
    ============================================================ */
 
 class Vehicle {
   constructor(settings) {
-    /* settings = { power, grip, steering }  (1-10 each) */
     settings = settings || { power: 5, grip: 5, steering: 5 };
 
-    /* ── Position & kinematics ── */
-    this.x         = 0;
-    this.y         = 0;
-    this.angle     = 0;   // heading, radians (0 = +X right)
-    this.vx        = 0;   // world-space velocity m/s
-    this.vy        = 0;
-    this.angularVel = 0;  // yaw rate rad/s
+    this.x = 0; this.y = 0; this.angle = 0;
+    this.vx = 0; this.vy = 0;
+    this.angularVel = 0;
 
-    /* ── Engine & transmission ── */
-    this.gear      = 1;
-    this.rpm       = CFG.CAR.minRPM;
-    this.engineRev = 0;   // 0-1 normalised
-    this.prevGear  = 1;   // for gear-shift detection
+    this.gear = 1; this.rpm = CFG.CAR.minRPM; this.engineRev = 0; this.prevGear = 1;
 
-    /* ── Inputs (written each physics step from InputManager) ── */
-    this.steerInput    = 0;
-    this.throttleInput = 0;
-    this.brakeInput    = 0;
-    this.handbrakeIn   = false;
+    this.steerInput = 0; this.throttleInput = 0; this.brakeInput = 0;
+    this.handbrakeIn = false;
 
-    /* ── Derived / observable state ── */
-    this.speed         = 0;   // |v| m/s
-    this.localVx       = 0;   // forward velocity
-    this.localVy       = 0;   // lateral velocity
-    this.driftAngle    = 0;   // rad
-    this.isDrifting    = false;
-    this.onTrack       = true;
-    this.trackIdx      = 0;
+    this.speed = 0; this.localVx = 0; this.localVy = 0;
+    this.driftAngle = 0; this.isDrifting = false;
+    this.onTrack = true; this.trackIdx = 0;
 
-    /* ── Weight transfer ── */
-    this.frontLoad     = 0.5; // 0–1 front weight fraction
-    this.rearLoad      = 0.5;
+    /* Weight distribution (per-axle fraction) */
+    this.frontLoad = 0.52; // AE86 52/48 front bias
+    this.rearLoad  = 0.48;
 
-    /* ── Nitro system ── */
-    this.nitro         = CFG.NITRO.maxCharge;
-    this.nitroActive   = false;
-    this.nitroInput    = false;
+    /* Tire temperatures (start slightly cold) */
+    this.tireTempFL = 25; this.tireTempFR = 25;
+    this.tireTempRL = 25; this.tireTempRR = 25;
 
-    /* ── Tuning multipliers from settings ── */
-    this._powerMult   = 0.7 + settings.power   * 0.06;   // 0.76 – 1.30
-    this._gripMult    = 0.6 + settings.grip     * 0.08;   // 0.68 – 1.40
-    this._steerMult   = 0.7 + settings.steering * 0.06;   // 0.76 – 1.30
+    this.nitro = CFG.NITRO.maxCharge;
+    this.nitroActive = false; this.nitroInput = false;
 
-    /* ── Collision / wall state ── */
-    this.wallHit      = false;
-    this.wallHitVel   = 0;
+    /* Lateral G for suspension lean (visual only) */
+    this.lateralG = 0;
+    this.longG = 0;
 
-    /* ── Near-miss tracking ── */
-    this.nearMiss     = false;
-    this.nearMissDist = Infinity;
+    /* Settings multipliers */
+    this._powerMult   = 0.72 + settings.power    * 0.056;
+    this._gripMult    = 0.65 + settings.grip      * 0.07;
+    this._steerMult   = 0.75 + settings.steering  * 0.05;
 
-    /* ── Gear shift event (for audio) ── */
-    this.gearShifted  = false;
+    this.wallHit = false; this.wallHitVel = 0;
+    this.nearMiss = false; this.nearMissDist = Infinity;
+    this.gearShifted = false;
+
+    /* Slip values (for tire temp / audio) */
+    this.rearSlipAngle = 0;
+    this.frontSlipAngle = 0;
   }
 
-  /* Reset to a spawn position */
   spawn(x, y, angle) {
     this.x = x; this.y = y; this.angle = angle;
     this.vx = this.vy = this.angularVel = 0;
     this.gear = 1; this.prevGear = 1; this.rpm = CFG.CAR.minRPM;
     this.steerInput = this.throttleInput = this.brakeInput = 0;
-    this.handbrakeIn = false;
-    this.wallHit = false;
-    this.nitro = CFG.NITRO.maxCharge;
-    this.nitroActive = false;
+    this.handbrakeIn = false; this.wallHit = false;
+    this.nitro = CFG.NITRO.maxCharge; this.nitroActive = false;
     this.gearShifted = false;
+    this.tireTempFL = this.tireTempFR = this.tireTempRL = this.tireTempRR = 25;
+    this.lateralG = 0; this.longG = 0;
   }
 
-  /* ── Main physics step (fixed dt = CFG.GAME.physicsDt) ── */
   step(dt, input) {
     if (dt <= 0) return;
     const C = CFG.CAR;
     const g = 9.81;
 
-    /* Copy inputs */
     this.steerInput    = input.steer;
     this.throttleInput = input.throttle;
     this.brakeInput    = input.brake;
@@ -91,125 +74,150 @@ class Vehicle {
     this.nitroInput    = input.nitro || false;
     this.gearShifted   = false;
 
-    /* ── Nitro logic ── */
+    /* ── Nitro ── */
     if (this.nitroInput && this.nitro > 0 && this.throttleInput > 0.1) {
       this.nitroActive = true;
       this.nitro = Math.max(0, this.nitro - CFG.NITRO.useRate * dt);
     } else {
       this.nitroActive = false;
     }
-    /* Recharge nitro while drifting */
     if (this.isDrifting && !this.nitroActive) {
       this.nitro = Math.min(CFG.NITRO.maxCharge, this.nitro + CFG.NITRO.rechargeRate * dt);
     }
 
+    /* ── Weather grip multiplier ── */
+    const weatherGrip = CFG.ENV.weatherGrip[CFG.ENV.weather] || 1.0;
+
     /* ── Local velocity ── */
     const cosA = Math.cos(this.angle), sinA = Math.sin(this.angle);
-    const lx   =  this.vx * cosA + this.vy * sinA;   // forward
-    const ly   = -this.vx * sinA + this.vy * cosA;   // lateral (+= sliding right)
-    this.localVx = lx;
-    this.localVy = ly;
+    const lx   =  this.vx * cosA + this.vy * sinA;
+    const ly   = -this.vx * sinA + this.vy * cosA;
+    this.localVx = lx; this.localVy = ly;
 
     const spd = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
     this.speed = spd;
+    const absFwd = Math.max(Math.abs(lx), 0.5);
 
     /* ── Drift angle ── */
-    const absFwd = Math.max(Math.abs(lx), 0.5);
-    this.driftAngle  = Math.atan2(Math.abs(ly), absFwd);
-    this.isDrifting  = (this.driftAngle > CFG.DRIFT.minAngle && spd > CFG.DRIFT.minSpeed);
+    this.driftAngle = Math.atan2(Math.abs(ly), absFwd);
+    this.isDrifting = (this.driftAngle > CFG.DRIFT.minAngle && spd > CFG.DRIFT.minSpeed);
 
-    /* ── Weight transfer (longitudinal) ── */
-    const accelG = (input.throttle - input.brake) * C.maxEngineForce / C.mass / g;
-    const transferLong = clamp(C.cgHeight / C.wheelbase * accelG * 0.3, -0.15, 0.15);
-    this.rearLoad  = 0.5 + transferLong;
-    this.frontLoad = 0.5 - transferLong;
+    /* ── Longitudinal weight transfer ── */
+    const throttleBrake = input.throttle - input.brake;
+    const longAccelG = throttleBrake * C.maxEngineForce / C.mass / g;
+    const longTransfer = clamp(C.cgHeight / C.wheelbase * longAccelG * 0.28, -0.18, 0.18);
+
+    /* ── Lateral weight transfer (based on yaw rate * speed) ── */
+    const latAccelG = this.angularVel * spd / g;
+    const latTransfer = clamp(C.cgHeight / C.trackWidth * latAccelG * 0.22, -0.20, 0.20);
+    this.lateralG = latAccelG;
+    this.longG    = longAccelG;
+
+    /* Per-axle load (combine long + lat, simplified for 2-axle model) */
+    this.rearLoad  = clamp(0.48 + longTransfer, 0.25, 0.72);
+    this.frontLoad = clamp(0.52 - longTransfer, 0.25, 0.72);
+    /* Lateral makes outer wheels heavier: affects rear oversteer tendency */
+    const rearLatLoad = clamp(0.50 + Math.abs(latTransfer) * 0.5, 0.5, 0.75);
 
     /* ── Aerodynamic downforce ── */
     const downforce = C.downforceCoeff * spd * spd;
-    const effectiveMass = C.mass + downforce / g;
+    const effMass = C.mass + downforce / g;
 
-    /* ── Steer angle (reduces at high speed) ── */
-    const spdFactor   = 1 - Math.min(spd * C.steerSpeedFactor, 0.55);
-    const steerAngle  = input.steer * C.maxSteerAngle * spdFactor * this._steerMult;
+    /* ── Steer angle ── */
+    const spdFactor  = 1 - Math.min(spd * C.steerSpeedFactor, 0.55);
+    const steerAngle = input.steer * C.maxSteerAngle * spdFactor * this._steerMult;
 
-    /* ── Slip angles at each axle ── */
+    /* ── Slip angles ── */
     const omega = this.angularVel;
     const frontSlip = Math.atan2(ly + omega * C.cgToFront, absFwd) - steerAngle;
     const rearSlip  = Math.atan2(ly - omega * C.cgToRear,  absFwd);
+    this.frontSlipAngle = frontSlip;
+    this.rearSlipAngle  = rearSlip;
 
-    /* ── Tire forces (improved Pacejka-like saturation) ── */
-    const maxLatFront = effectiveMass * g * this.frontLoad;
-    const maxLatRear  = effectiveMass * g * this.rearLoad;
+    /* ── Tire temperature effect on grip ── */
+    const gripFromTemp = (temp) => {
+      const tOpt = C.tireTempOptimal;
+      const tMin = C.tireTempGripMin || 0.65;
+      if (temp <= tOpt) {
+        // cold: ramp up from tMin at 20°C to 1.0 at tOpt
+        return tMin + (1 - tMin) * clamp((temp - 20) / (tOpt - 20), 0, 1);
+      } else {
+        // hot: drop from 1.0 at tOpt to tMin at 140°C
+        return 1.0 - (1 - tMin) * clamp((temp - tOpt) / (140 - tOpt), 0, 1);
+      }
+    };
+    const tempGripFront = (gripFromTemp(this.tireTempFL) + gripFromTemp(this.tireTempFR)) * 0.5;
+    const tempGripRear  = (gripFromTemp(this.tireTempRL) + gripFromTemp(this.tireTempRR)) * 0.5;
 
-    /* Off-road grip reduction */
-    const gripScale = this.onTrack ? 1.0 : C.offroadGrip;
+    /* ── Update tire temperatures ── */
+    const frontSlipMag = Math.abs(frontSlip);
+    const rearSlipMag  = Math.abs(rearSlip);
+    const heatRate = C.tireTempHeat || 14;
+    const coolRate = C.tireTempCool || 3.5;
+    const tHeat = (slip) => clamp(slip * 4, 0, 1) * heatRate * dt;
+    const tCool = coolRate * dt;
+    this.tireTempFL = clamp(this.tireTempFL + tHeat(frontSlipMag) - tCool, 20, 150);
+    this.tireTempFR = clamp(this.tireTempFR + tHeat(frontSlipMag) - tCool, 20, 150);
+    this.tireTempRL = clamp(this.tireTempRL + tHeat(rearSlipMag) - tCool + (this.handbrakeIn ? heatRate * dt * 0.5 : 0), 20, 150);
+    this.tireTempRR = clamp(this.tireTempRR + tHeat(rearSlipMag) - tCool + (this.handbrakeIn ? heatRate * dt * 0.5 : 0), 20, 150);
 
-    const rearGripCoeff = this.handbrakeIn
-                          ? C.handbrakeGrip
-                          : this._gripMult * gripScale;
-
-    const frontGripScaled = C.frontGrip * this._gripMult * gripScale;
-
-    /* Pacejka-like saturation: F = Fmax * sin(atan(B * slip)) */
-    const pacejka = (slip, grip, maxF) => {
-      const B = grip * 2.5;
-      return -maxF * Math.sin(Math.atan(B * slip));
+    /* ── Full Pacejka Magic Formula: F = D*sin(C*atan(B*s - E*(B*s - atan(B*s)))) ── */
+    const pacejka = (slip, B, Cv, D, E, maxF) => {
+      const Bs  = B * slip;
+      const val = D * Math.sin(Cv * Math.atan(Bs - E * (Bs - Math.atan(Bs))));
+      return clamp(-val * maxF, -maxF, maxF);
     };
 
-    let Fy_front = pacejka(frontSlip, frontGripScaled / C.frontGrip, maxLatFront);
-    let Fy_rear  = pacejka(rearSlip,  rearGripCoeff,                 maxLatRear);
+    const offGrip  = this.onTrack ? 1.0 : C.offroadGrip;
+    const rearGrip = this.handbrakeIn ? C.handbrakeGrip : this._gripMult * offGrip * weatherGrip;
+    const frtGrip  = this._gripMult * offGrip * weatherGrip;
 
-    /* Clamp forces */
-    Fy_front = clamp(Fy_front, -maxLatFront, maxLatFront);
-    Fy_rear  = clamp(Fy_rear,  -maxLatRear,  maxLatRear);
+    const maxLatFront = effMass * g * this.frontLoad * tempGripFront;
+    const maxLatRear  = effMass * g * this.rearLoad  * rearLatLoad * tempGripRear;
 
-    /* ── Engine / brake force ── */
-    const gear    = this.gear;
-    const ratio   = C.gearRatios[gear] * C.finalDrive;
-    /* Power drops at high speed (constant-power model) */
-    const fwdSpd  = Math.max(Math.abs(lx), 0.1);
-    let maxEng  = (C.maxEngineForce * this._powerMult) / Math.max(1, fwdSpd / 8);
+    let Fy_front = pacejka(frontSlip, C.tireBFront * frtGrip, C.tireCFront, C.tireDFront, C.tireEFront, maxLatFront);
+    let Fy_rear  = pacejka(rearSlip,  C.tireBRear  * rearGrip, C.tireCRear, C.tireDRear,  C.tireERear,  maxLatRear);
 
-    /* Apply nitro force boost */
-    if (this.nitroActive) {
-      maxEng *= CFG.NITRO.forceMult;
-    }
+    /* ── Engine torque curve (4A-GE approximation) ── */
+    const gear   = this.gear;
+    const ratio  = C.gearRatios[gear] * C.finalDrive;
+    const fwdSpd = Math.max(Math.abs(lx), 0.1);
+    /* Normalised RPM-based torque multiplier: peaks ~0.65 RPM norm */
+    const rpmNorm  = clamp((this.rpm - C.minRPM) / (C.maxRPM - C.minRPM), 0, 1);
+    let torqueMult;
+    if (rpmNorm < 0.25) torqueMult = 0.60 + rpmNorm * 1.4;
+    else if (rpmNorm < 0.70) torqueMult = 0.95 + (rpmNorm - 0.25) * 0.11;
+    else if (rpmNorm < 0.85) torqueMult = 1.0;
+    else torqueMult = 1.0 - (rpmNorm - 0.85) * 2.5;
+    torqueMult = clamp(torqueMult, 0.2, 1.0);
 
-    const engineF = input.throttle * clamp(maxEng, 0, C.maxEngineForce * this._powerMult * (this.nitroActive ? 3.0 : 1.6));
-    const brakeF  = input.brake    * C.maxBrakeForce;
+    let maxEng = C.maxEngineForce * this._powerMult * torqueMult / Math.max(1, fwdSpd / 9);
+    if (this.nitroActive) maxEng *= CFG.NITRO.forceMult;
+    const engineF = input.throttle * clamp(maxEng, 0, C.maxEngineForce * this._powerMult * (this.nitroActive ? 3.0 : 1.5));
+    const brakeF  = input.brake * C.maxBrakeForce;
 
-    /* Only drive when going forward */
     const goingFwd = lx > -1;
-    const Fx_local = goingFwd
-                     ? engineF - brakeF
-                     : -brakeF * 0.5;
+    const Fx_local = goingFwd ? engineF - brakeF : -brakeF * 0.5;
 
-    /* ── Torque & yaw ── */
-    const torque   = Fy_front * C.cgToFront - Fy_rear * C.cgToRear;
-    const yawAccel = torque / C.inertia;
-    this.angularVel += yawAccel * dt;
+    /* ── Yaw torque & integration ── */
+    const torque = Fy_front * C.cgToFront - Fy_rear * C.cgToRear;
+    this.angularVel += (torque / C.inertia) * dt;
+    this.angularVel *= Math.max(0, 1 - 2.0 * dt);
 
-    /* Angular drag — prevents infinite spin */
-    this.angularVel *= Math.max(0, 1 - 2.2 * dt);
-
-    /* ── Convert local forces → world ── */
+    /* ── World forces ── */
     const Fy_total = Fy_front + Fy_rear;
     const ax = (Fx_local * cosA - Fy_total * sinA) / C.mass;
     const ay = (Fx_local * sinA + Fy_total * cosA) / C.mass;
-
-    /* ── Integrate velocity ── */
     this.vx += ax * dt;
     this.vy += ay * dt;
 
-    /* ── Aerodynamic drag ── */
+    /* ── Drag ── */
     if (spd > 0.01) {
-      let dragMul = this.onTrack ? 1.0 : C.offroadDrag;
-      const dragAcceleration = (C.dragCoeff * dragMul * spd * spd) / C.mass;
-      this.vx -= dragAcceleration * (this.vx / spd) * dt;
-      this.vy -= dragAcceleration * (this.vy / spd) * dt;
+      const dragMul = this.onTrack ? 1.0 : C.offroadDrag;
+      const dragAcc = C.dragCoeff * dragMul * spd * spd / C.mass;
+      this.vx -= dragAcc * (this.vx / spd) * dt;
+      this.vy -= dragAcc * (this.vy / spd) * dt;
     }
-
-    /* Rolling resistance */
     if (spd > 0.1) {
       const rr = C.rollingResist / C.mass;
       this.vx -= rr * (this.vx / spd) * dt;
@@ -219,24 +227,17 @@ class Vehicle {
       this.vy *= Math.pow(0.04, dt);
     }
 
-    /* Speed cap (increased during nitro) */
+    /* Speed cap */
     const maxSpd = this.nitroActive ? C.maxSpeed + CFG.NITRO.speedBoost : C.maxSpeed;
     const spd2 = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
-    if (spd2 > maxSpd) {
-      this.vx *= maxSpd / spd2;
-      this.vy *= maxSpd / spd2;
-    }
+    if (spd2 > maxSpd) { this.vx *= maxSpd / spd2; this.vy *= maxSpd / spd2; }
 
-    /* ── Integrate position & heading ── */
     this.x     += this.vx * dt;
     this.y     += this.vy * dt;
     this.angle += this.angularVel * dt;
-
-    /* Normalise angle */
     while (this.angle >  Math.PI) this.angle -= 2 * Math.PI;
     while (this.angle < -Math.PI) this.angle += 2 * Math.PI;
 
-    /* ── Engine RPM (auto-gearbox) ── */
     this._updateGear(lx, C);
   }
 
@@ -248,26 +249,23 @@ class Vehicle {
     this.engineRev = (this.rpm - C.minRPM) / (C.maxRPM - C.minRPM);
 
     if (this.throttleInput > 0.05) {
-      if (this.rpm > C.maxRPM * C.autoShiftUp   && this.gear < 6) this.gear++;
+      if (this.rpm > C.maxRPM * C.autoShiftUp   && this.gear < 5) this.gear++;
       if (this.rpm < C.maxRPM * C.autoShiftDown  && this.gear > 1) this.gear--;
     }
     if (this.gear !== this.prevGear) this.gearShifted = true;
   }
 
-  /* Wall / boundary bounce */
   bounceOffWall(nx, ny) {
     const dot = this.vx * nx + this.vy * ny;
     if (dot < 0) {
-      const restitution = 0.35;
+      const restitution = 0.30;
       this.vx -= (1 + restitution) * dot * nx;
       this.vy -= (1 + restitution) * dot * ny;
       this.wallHit    = true;
       this.wallHitVel = Math.abs(dot);
-      /* Kill some angular velocity */
-      this.angularVel *= 0.6;
+      this.angularVel *= 0.55;
     }
   }
 }
 
-/* ── Utility ── */
 function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
