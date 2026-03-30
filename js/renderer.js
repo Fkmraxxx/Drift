@@ -532,15 +532,16 @@ class Renderer {
       ctx.fillRect(-wl / 2, -ww / 2, wl, ww);
       ctx.fillStyle = rimColor;
       ctx.fillRect(-wl / 2 + 0.05, -ww / 2 + 0.05, wl - 0.10, ww - 0.10);
-      if (car.brakeInput > 0.5 && car.speed > 5) {
-        ctx.fillStyle = 'rgba(255,80,0,0.4)';
+      /* Brake disc glow when braking hard (front wheels) / tire slip heat (rear) */
+      if (slip > 0.3 || (car.brakeInput > 0.5 && car.speed > 5)) {
+        ctx.fillStyle = `rgba(255,80,0,${Math.min(0.55, 0.25 + slip * 0.3)})`;
         ctx.fillRect(-wl / 2 + 0.08, -ww / 2 + 0.08, wl - 0.16, ww - 0.16);
       }
       ctx.restore();
     };
 
-    drawWheel(-W * 0.88, -L * 0.60, steer, 0);
-    drawWheel( W * 0.88, -L * 0.60, steer, 0);
+    drawWheel(-W * 0.88, -L * 0.60, steer, car.brakeInput > 0.5 ? 0.5 : 0);
+    drawWheel( W * 0.88, -L * 0.60, steer, car.brakeInput > 0.5 ? 0.5 : 0);
     drawWheel(-W * 0.88,  L * 0.62, 0, slipMag);
     drawWheel( W * 0.88,  L * 0.62, 0, slipMag);
   }

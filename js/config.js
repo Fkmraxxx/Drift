@@ -99,7 +99,6 @@ const CFG = {
     smokeSpeed:     3.5,     // m/s initial velocity
     sparkLifetime:  0.7,
     speedLineThreshold: 24,
-    rainDrops: 200,
   },
 
   /* ── Environment / Weather ───────────────────────────────── */

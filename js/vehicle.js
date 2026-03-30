@@ -113,9 +113,8 @@ class Vehicle {
     this.lateralG = latAccelG;
     this.longG    = longAccelG;
 
-    /* Per-axle load — clamp transfer then derive both axles from it */
-    const clampedLongTransfer = clamp(longTransfer, -0.18, 0.18);
-    this.rearLoad  = 0.48 + clampedLongTransfer;
+    /* Per-axle load — derive both axles from the already-clamped longTransfer */
+    this.rearLoad  = 0.48 + longTransfer;
     this.frontLoad = 1.0 - this.rearLoad;
     /* Lateral makes outer wheels heavier: affects rear oversteer tendency */
     const rearLatLoad = clamp(0.50 + Math.abs(latTransfer) * 0.5, 0.5, 0.75);
