@@ -48,6 +48,10 @@ class Vehicle {
     /* Slip values (for tire temp / audio) */
     this.rearSlipAngle = 0;
     this.frontSlipAngle = 0;
+
+    /* Tire relaxation state (lagged slip angles, build up over distance) */
+    this._relaxFrontSlip = 0;
+    this._relaxRearSlip  = 0;
   }
 
   spawn(x, y, angle) {
@@ -60,6 +64,7 @@ class Vehicle {
     this.gearShifted = false;
     this.tireTempFL = this.tireTempFR = this.tireTempRL = this.tireTempRR = 25;
     this.lateralG = 0; this.longG = 0;
+    this._relaxFrontSlip = 0; this._relaxRearSlip = 0;
   }
 
   step(dt, input) {
@@ -129,8 +134,23 @@ class Vehicle {
 
     /* ── Slip angles ── */
     const omega = this.angularVel;
-    const frontSlip = Math.atan2(ly + omega * C.cgToFront, absFwd) - steerAngle;
-    const rearSlip  = Math.atan2(ly - omega * C.cgToRear,  absFwd);
+    const rawFrontSlip = Math.atan2(ly + omega * C.cgToFront, absFwd) - steerAngle;
+    const rawRearSlip  = Math.atan2(ly - omega * C.cgToRear,  absFwd);
+
+    /* ── Tire relaxation length ──
+       Tires don't generate force instantly — the contact patch deforms over
+       a characteristic distance (relaxation length). This is modelled as a
+       first-order lag: dα_eff/ds = (α_raw − α_eff) / σ
+       where ds = speed · dt and σ = relaxation length.
+       At very low speed the filter is bypassed to avoid division issues. */
+    const relaxLen = C.tireRelaxLen || 0.14;
+    const ds = Math.max(spd, 0.5) * dt;            // distance travelled this step
+    const relaxBlend = clamp(ds / relaxLen, 0, 1);   // 0 = no change, 1 = instant catch-up
+    this._relaxFrontSlip += (rawFrontSlip - this._relaxFrontSlip) * relaxBlend;
+    this._relaxRearSlip  += (rawRearSlip  - this._relaxRearSlip)  * relaxBlend;
+
+    const frontSlip = this._relaxFrontSlip;
+    const rearSlip  = this._relaxRearSlip;
     this.frontSlipAngle = frontSlip;
     this.rearSlipAngle  = rearSlip;
 
@@ -139,10 +159,8 @@ class Vehicle {
       const tOpt = C.tireTempOptimal;
       const tMin = C.tireTempGripMin || 0.65;
       if (temp <= tOpt) {
-        // cold: ramp up from tMin at 20°C to 1.0 at tOpt
         return tMin + (1 - tMin) * clamp((temp - 20) / (tOpt - 20), 0, 1);
       } else {
-        // hot: drop from 1.0 at tOpt to tMin at 140°C
         return 1.0 - (1 - tMin) * clamp((temp - tOpt) / (140 - tOpt), 0, 1);
       }
     };
@@ -172,8 +190,18 @@ class Vehicle {
     const rearGrip = this.handbrakeIn ? C.handbrakeGrip : this._gripMult * offGrip * weatherGrip;
     const frtGrip  = this._gripMult * offGrip * weatherGrip;
 
-    const maxLatFront = effMass * g * this.frontLoad * tempGripFront;
-    const maxLatRear  = effMass * g * this.rearLoad  * rearLatLoad * tempGripRear;
+    /* ── Load sensitivity ──
+       Real tires lose efficiency per unit of vertical load as load increases.
+       µ_eff = µ_base * (1 − loadSens * Fz)
+       This makes weight transfer effects much more pronounced:
+       the lighter wheel gains proportionally more than the heavier wheel loses. */
+    const loadSens  = C.loadSensitivity || 0;
+    const Fz_front  = effMass * g * this.frontLoad;
+    const Fz_rear   = effMass * g * this.rearLoad * rearLatLoad;
+    const lsFront   = clamp(1 - loadSens * Fz_front, 0.5, 1.0);
+    const lsRear    = clamp(1 - loadSens * Fz_rear,  0.5, 1.0);
+    const maxLatFront = Fz_front * tempGripFront * lsFront;
+    const maxLatRear  = Fz_rear  * tempGripRear  * lsRear;
 
     let Fy_front = pacejka(frontSlip, C.tireBFront * frtGrip, C.tireCFront, C.tireDFront, C.tireEFront, maxLatFront);
     let Fy_rear  = pacejka(rearSlip,  C.tireBRear  * rearGrip, C.tireCRear, C.tireDRear,  C.tireERear,  maxLatRear);
@@ -196,13 +224,34 @@ class Vehicle {
     const engineF = input.throttle * clamp(maxEng, 0, C.maxEngineForce * this._powerMult * (this.nitroActive ? 3.0 : 1.5));
     const brakeF  = input.brake * C.maxBrakeForce;
 
+    /* ── Engine braking ──
+       When the driver lifts off the throttle, the engine provides a
+       retarding force through internal friction and pumping losses.
+       This is proportional to RPM and only applies when going forward. */
+    const engBrake = (C.engineBrakeForce || 0) * rpmNorm * clamp(1 - input.throttle, 0, 1);
+
     const goingFwd = lx > -1;
-    const Fx_local = goingFwd ? engineF - brakeF : -brakeF * 0.5;
+    const Fx_local = goingFwd ? engineF - brakeF - engBrake : -brakeF * 0.5;
+
+    /* ── Self-aligning torque ──
+       The pneumatic trail creates a restoring moment that tends to
+       straighten the front wheels. Proportional to front lateral force. */
+    const alignCoeff = C.alignTorqueCoeff || 0;
+    const selfAlignTorque = -Fy_front * alignCoeff;
 
     /* ── Yaw torque & integration ── */
-    const torque = Fy_front * C.cgToFront - Fy_rear * C.cgToRear;
+    const torque = Fy_front * C.cgToFront - Fy_rear * C.cgToRear + selfAlignTorque;
     this.angularVel += (torque / C.inertia) * dt;
-    this.angularVel *= Math.max(0, 1 - 2.0 * dt);
+
+    /* Speed-dependent yaw damping: more damping at low speed (parking),
+       less artificial damping at high speed where tire forces dominate.
+       yawDampBase: baseline damping rate (/s) — always present to prevent spin-outs.
+       yawDampLow:  extra damping added at very low speed for parking stability.
+       The 0.15 divisor controls how quickly extra damping fades with speed. */
+    const yawDampBase = 1.5;
+    const yawDampLow  = 0.8;
+    const yawDamp = yawDampBase + yawDampLow / (1 + spd * 0.15);
+    this.angularVel *= Math.max(0, 1 - yawDamp * dt);
 
     /* ── World forces ── */
     const Fy_total = Fy_front + Fy_rear;
