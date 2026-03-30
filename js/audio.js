@@ -42,7 +42,7 @@ const AudioManager = (() => {
       })
       .then(function (ab) { return _ctx().decodeAudioData(ab); })
       .then(function (decoded) { buf[name] = decoded; })
-      .catch(function () { /* non-fatal */ });
+      .catch(function (e) { console.warn('Audio: failed to load ' + filename, e); });
   }
 
   function _makeLoop(bufName, dest, startGain) {
@@ -217,7 +217,7 @@ const AudioManager = (() => {
       layer.gainA.gain.setTargetAtTime(g, t, 0.04);
       layer.gainExh.gain.setTargetAtTime(g * 0.65, t, 0.04);
 
-      /* Pitch-shift to match exact RPM */
+      /* Pitch-shift to match exact RPM (clamped to 0.5–2.0× for audio quality) */
       var rate = rpm / ENG_RPMS[j];
       rate = Math.max(0.5, Math.min(2.0, rate));
       if (layer.srcA)   layer.srcA.playbackRate.setTargetAtTime(rate, t, 0.05);
