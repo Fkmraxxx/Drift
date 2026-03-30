@@ -50,7 +50,7 @@ const AudioManager = (() => {
     const g2 = ac.createGain(); g2.gain.value = 0.22;
     engOsc2.connect(g2); g2.connect(engMaster);
 
-    /* Third harmonic for fuller sound */
+    /* Third harmonic for fuller sound — triangle wave is soft enough to skip filtering */
     engOsc3 = ac.createOscillator();
     engOsc3.type      = 'triangle';
     engOsc3.frequency.value = 240;

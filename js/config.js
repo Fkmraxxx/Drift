@@ -67,6 +67,7 @@ const CFG = {
     maxMultiplier:   12,      // raised from 8 for longer drift chains
     comboStep:       0.35,    // multiplier increase per continuous drift-second
     comboAccel:      0.04,    // comboStep grows by this much per second of drift
+    comboStepMax:    3,       // max multiplier of base comboStep (acceleration cap)
     wallPenalty:    -700,     // pts on wall hit
     offroadPenalty: -200,     // pts/s off-road
     nearMissDist:    1.8,     // m — distance from wall for near-miss bonus

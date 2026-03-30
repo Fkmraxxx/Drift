@@ -109,7 +109,7 @@ class DriftScoring {
 
       /* Increase multiplier (accelerates over time) */
       this._comboStepCurrent = Math.min(
-        D.comboStep * 3,
+        D.comboStep * D.comboStepMax,
         this._comboStepCurrent + D.comboAccel * dt
       );
       const incr = this._comboStepCurrent * dt;
