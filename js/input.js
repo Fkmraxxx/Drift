@@ -12,6 +12,7 @@ class InputManager {
     this.throttle  = 0;   //  0 … +1
     this.brake     = 0;   //  0 … +1
     this.handbrake = false;
+    this.nitro     = false;
 
     /* Rising-edge events (true for exactly one update call) */
     this.pausePressed  = false;
@@ -40,7 +41,7 @@ class InputManager {
 
   update() {
     const k = this._keys;
-    let steer = 0, throttle = 0, brake = 0, hb = false;
+    let steer = 0, throttle = 0, brake = 0, hb = false, nitro = false;
 
     /* ── Keyboard ── */
     if (k.has('ArrowLeft')  || k.has('KeyA')) steer    -= 1;
@@ -48,6 +49,7 @@ class InputManager {
     if (k.has('ArrowUp')    || k.has('KeyW')) throttle  = 1;
     if (k.has('ArrowDown')  || k.has('KeyS')) brake     = 1;
     if (k.has('Space') || k.has('ShiftLeft') || k.has('ShiftRight')) hb = true;
+    if (k.has('KeyN') || k.has('KeyB')) nitro = true;
 
     /* ── Gamepad ── */
     if (this._gpIdx !== null) {
@@ -61,6 +63,7 @@ class InputManager {
         if ((gp.axes[1] ?? 0) < -0.5) throttle = Math.max(throttle, 1);
         if ((gp.axes[1] ?? 0) >  0.5) brake    = Math.max(brake,    1);
         if (gp.buttons[0]?.pressed || gp.buttons[2]?.pressed) hb = true;
+        if (gp.buttons[1]?.pressed || gp.buttons[3]?.pressed) nitro = true;
       }
     }
 
@@ -68,6 +71,7 @@ class InputManager {
     this.throttle  = Math.max(0,  Math.min(1, throttle));
     this.brake     = Math.max(0,  Math.min(1, brake));
     this.handbrake = hb;
+    this.nitro     = nitro;
 
     /* Rising-edge detection */
     const pn = k.has('Escape') || k.has('KeyP');

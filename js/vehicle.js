@@ -1,6 +1,7 @@
 /* ============================================================
    DRIFT KING — Vehicle Physics
-   Simplified but realistic 2-axle tire model with drift
+   Realistic 2-axle tire model with weight transfer, downforce,
+   nitro boost, and drift mechanics
    ============================================================ */
 
 class Vehicle {
@@ -20,6 +21,7 @@ class Vehicle {
     this.gear      = 1;
     this.rpm       = CFG.CAR.minRPM;
     this.engineRev = 0;   // 0-1 normalised
+    this.prevGear  = 1;   // for gear-shift detection
 
     /* ── Inputs (written each physics step from InputManager) ── */
     this.steerInput    = 0;
@@ -36,6 +38,15 @@ class Vehicle {
     this.onTrack       = true;
     this.trackIdx      = 0;
 
+    /* ── Weight transfer ── */
+    this.frontLoad     = 0.5; // 0–1 front weight fraction
+    this.rearLoad      = 0.5;
+
+    /* ── Nitro system ── */
+    this.nitro         = CFG.NITRO.maxCharge;
+    this.nitroActive   = false;
+    this.nitroInput    = false;
+
     /* ── Tuning multipliers from settings ── */
     this._powerMult   = 0.7 + settings.power   * 0.06;   // 0.76 – 1.30
     this._gripMult    = 0.6 + settings.grip     * 0.08;   // 0.68 – 1.40
@@ -44,16 +55,26 @@ class Vehicle {
     /* ── Collision / wall state ── */
     this.wallHit      = false;
     this.wallHitVel   = 0;
+
+    /* ── Near-miss tracking ── */
+    this.nearMiss     = false;
+    this.nearMissDist = Infinity;
+
+    /* ── Gear shift event (for audio) ── */
+    this.gearShifted  = false;
   }
 
   /* Reset to a spawn position */
   spawn(x, y, angle) {
     this.x = x; this.y = y; this.angle = angle;
     this.vx = this.vy = this.angularVel = 0;
-    this.gear = 1; this.rpm = CFG.CAR.minRPM;
+    this.gear = 1; this.prevGear = 1; this.rpm = CFG.CAR.minRPM;
     this.steerInput = this.throttleInput = this.brakeInput = 0;
     this.handbrakeIn = false;
     this.wallHit = false;
+    this.nitro = CFG.NITRO.maxCharge;
+    this.nitroActive = false;
+    this.gearShifted = false;
   }
 
   /* ── Main physics step (fixed dt = CFG.GAME.physicsDt) ── */
@@ -67,6 +88,20 @@ class Vehicle {
     this.throttleInput = input.throttle;
     this.brakeInput    = input.brake;
     this.handbrakeIn   = input.handbrake;
+    this.nitroInput    = input.nitro || false;
+    this.gearShifted   = false;
+
+    /* ── Nitro logic ── */
+    if (this.nitroInput && this.nitro > 0 && this.throttleInput > 0.1) {
+      this.nitroActive = true;
+      this.nitro = Math.max(0, this.nitro - CFG.NITRO.useRate * dt);
+    } else {
+      this.nitroActive = false;
+    }
+    /* Recharge nitro while drifting */
+    if (this.isDrifting && !this.nitroActive) {
+      this.nitro = Math.min(CFG.NITRO.maxCharge, this.nitro + CFG.NITRO.rechargeRate * dt);
+    }
 
     /* ── Local velocity ── */
     const cosA = Math.cos(this.angle), sinA = Math.sin(this.angle);
@@ -83,6 +118,16 @@ class Vehicle {
     this.driftAngle  = Math.atan2(Math.abs(ly), absFwd);
     this.isDrifting  = (this.driftAngle > CFG.DRIFT.minAngle && spd > CFG.DRIFT.minSpeed);
 
+    /* ── Weight transfer (longitudinal) ── */
+    const accelG = (input.throttle - input.brake) * C.maxEngineForce / C.mass / g;
+    const transferLong = clamp(C.cgHeight / C.wheelbase * accelG * 0.3, -0.15, 0.15);
+    this.rearLoad  = 0.5 + transferLong;
+    this.frontLoad = 0.5 - transferLong;
+
+    /* ── Aerodynamic downforce ── */
+    const downforce = C.downforceCoeff * spd * spd;
+    const effectiveMass = C.mass + downforce / g;
+
     /* ── Steer angle (reduces at high speed) ── */
     const spdFactor   = 1 - Math.min(spd * C.steerSpeedFactor, 0.55);
     const steerAngle  = input.steer * C.maxSteerAngle * spdFactor * this._steerMult;
@@ -92,24 +137,45 @@ class Vehicle {
     const frontSlip = Math.atan2(ly + omega * C.cgToFront, absFwd) - steerAngle;
     const rearSlip  = Math.atan2(ly - omega * C.cgToRear,  absFwd);
 
-    /* ── Tire forces (simplified Pacejka peak model) ── */
-    const maxLat        = C.mass * g * 0.5;
+    /* ── Tire forces (improved Pacejka-like saturation) ── */
+    const maxLatFront = effectiveMass * g * this.frontLoad;
+    const maxLatRear  = effectiveMass * g * this.rearLoad;
+
+    /* Off-road grip reduction */
+    const gripScale = this.onTrack ? 1.0 : C.offroadGrip;
+
     const rearGripCoeff = this.handbrakeIn
                           ? C.handbrakeGrip
-                          : this._gripMult;
+                          : this._gripMult * gripScale;
 
-    let Fy_front = -clamp(C.frontGrip * this._gripMult * frontSlip * C.mass * g * 0.5,
-                          -maxLat, maxLat);
-    let Fy_rear  = -clamp(C.rearGrip  * rearGripCoeff  * rearSlip  * C.mass * g * 0.5,
-                          -maxLat, maxLat);
+    const frontGripScaled = C.frontGrip * this._gripMult * gripScale;
+
+    /* Pacejka-like saturation: F = Fmax * sin(atan(B * slip)) */
+    const pacejka = (slip, grip, maxF) => {
+      const B = grip * 2.5;
+      return -maxF * Math.sin(Math.atan(B * slip));
+    };
+
+    let Fy_front = pacejka(frontSlip, frontGripScaled / C.frontGrip, maxLatFront);
+    let Fy_rear  = pacejka(rearSlip,  rearGripCoeff,                 maxLatRear);
+
+    /* Clamp forces */
+    Fy_front = clamp(Fy_front, -maxLatFront, maxLatFront);
+    Fy_rear  = clamp(Fy_rear,  -maxLatRear,  maxLatRear);
 
     /* ── Engine / brake force ── */
     const gear    = this.gear;
     const ratio   = C.gearRatios[gear] * C.finalDrive;
     /* Power drops at high speed (constant-power model) */
     const fwdSpd  = Math.max(Math.abs(lx), 0.1);
-    const maxEng  = (C.maxEngineForce * this._powerMult) / Math.max(1, fwdSpd / 8);
-    const engineF = input.throttle * clamp(maxEng, 0, C.maxEngineForce * this._powerMult * 1.6);
+    let maxEng  = (C.maxEngineForce * this._powerMult) / Math.max(1, fwdSpd / 8);
+
+    /* Apply nitro force boost */
+    if (this.nitroActive) {
+      maxEng *= CFG.NITRO.forceMult;
+    }
+
+    const engineF = input.throttle * clamp(maxEng, 0, C.maxEngineForce * this._powerMult * (this.nitroActive ? 3.0 : 1.6));
     const brakeF  = input.brake    * C.maxBrakeForce;
 
     /* Only drive when going forward */
@@ -137,7 +203,8 @@ class Vehicle {
 
     /* ── Aerodynamic drag ── */
     if (spd > 0.01) {
-      const drag = C.dragCoeff * spd * spd;
+      let dragMul = this.onTrack ? 1.0 : C.offroadDrag;
+      const drag = C.dragCoeff * dragMul * spd * spd;
       this.vx -= drag * (this.vx / spd) * dt;
       this.vy -= drag * (this.vy / spd) * dt;
     }
@@ -152,11 +219,12 @@ class Vehicle {
       this.vy *= Math.pow(0.04, dt);
     }
 
-    /* Speed cap */
+    /* Speed cap (increased during nitro) */
+    const maxSpd = this.nitroActive ? C.maxSpeed + CFG.NITRO.speedBoost : C.maxSpeed;
     const spd2 = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
-    if (spd2 > C.maxSpeed) {
-      this.vx *= C.maxSpeed / spd2;
-      this.vy *= C.maxSpeed / spd2;
+    if (spd2 > maxSpd) {
+      this.vx *= maxSpd / spd2;
+      this.vy *= maxSpd / spd2;
     }
 
     /* ── Integrate position & heading ── */
@@ -173,6 +241,7 @@ class Vehicle {
   }
 
   _updateGear(fwdSpd, C) {
+    this.prevGear = this.gear;
     const ratio  = C.gearRatios[this.gear] * C.finalDrive;
     const wRPM   = (Math.abs(fwdSpd) / (2 * Math.PI * C.wheelRadius)) * 60;
     this.rpm     = clamp(wRPM * ratio, C.minRPM, C.maxRPM * 1.05);
@@ -182,6 +251,7 @@ class Vehicle {
       if (this.rpm > C.maxRPM * C.autoShiftUp   && this.gear < 6) this.gear++;
       if (this.rpm < C.maxRPM * C.autoShiftDown  && this.gear > 1) this.gear--;
     }
+    if (this.gear !== this.prevGear) this.gearShifted = true;
   }
 
   /* Wall / boundary bounce */
