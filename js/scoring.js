@@ -1,5 +1,6 @@
 /* ============================================================
    DRIFT KING — Drift Scoring & Combo System
+   With drift ratings, near-miss bonuses, and chain acceleration
    ============================================================ */
 
 class DriftScoring {
@@ -17,6 +18,18 @@ class DriftScoring {
     this.comboPopup     = 0;      // show "COMBO x!" for this many seconds
     this.newRecord      = false;
     this._bonusPending  = 0;
+
+    /* Drift rating system */
+    this.driftRating    = '';     // GOOD / GREAT / INSANE / LEGENDARY
+    this.ratingTimer    = 0;     // seconds to show rating
+    this.ratingPulse    = 0;     // animation timer
+
+    /* Near-miss tracking */
+    this.nearMissActive = false;
+    this.nearMissTimer  = 0;
+
+    /* Combo step acceleration */
+    this._comboStepCurrent = CFG.DRIFT.comboStep;
   }
 
   reset() {
@@ -28,12 +41,19 @@ class DriftScoring {
     this.displayScore = 0;
     this.newRecord    = false;
     this._bonusPending = 0;
+    this.driftRating  = '';
+    this.ratingTimer  = 0;
+    this._comboStepCurrent = CFG.DRIFT.comboStep;
   }
 
   /* Call every physics step */
   update(car, dt, onTrack) {
     const D = CFG.DRIFT;
     this.lastScoreDelta = 0;
+
+    /* Rating timer countdown */
+    if (this.ratingTimer > 0) this.ratingTimer -= dt;
+    if (this.nearMissTimer > 0) this.nearMissTimer -= dt;
 
     /* Off-road penalty */
     if (!onTrack) {
@@ -56,11 +76,23 @@ class DriftScoring {
       return;
     }
 
+    /* Near-miss bonus — drifting close to walls */
+    if (car.isDrifting && car.nearMiss) {
+      const nmBonus = D.nearMissBonus * dt;
+      this.score      += nmBonus;
+      this.totalScore += nmBonus;
+      this.nearMissActive = true;
+      this.nearMissTimer  = 1.0;
+    } else {
+      this.nearMissActive = false;
+    }
+
     /* Drifting */
     if (car.isDrifting) {
       if (!this.isDrifting) {
         this.isDrifting = true;
         this.driftTime  = 0;
+        this._comboStepCurrent = D.comboStep;
       }
 
       this.driftTime  += dt;
@@ -75,9 +107,16 @@ class DriftScoring {
       this.totalScore     += pts;
       this.lastScoreDelta  = pts;
 
-      /* Increase multiplier */
-      const incr = D.comboStep * dt;
+      /* Increase multiplier (accelerates over time) */
+      this._comboStepCurrent = Math.min(
+        D.comboStep * 3,
+        this._comboStepCurrent + D.comboAccel * dt
+      );
+      const incr = this._comboStepCurrent * dt;
       this.multiplier = Math.min(D.maxMultiplier, this.multiplier + incr);
+
+      /* Update drift rating based on angle & duration */
+      this._updateRating(car);
 
     } else {
       if (this.isDrifting) {
@@ -99,6 +138,29 @@ class DriftScoring {
     if (this.comboPopup > 0) this.comboPopup -= dt;
   }
 
+  _updateRating(car) {
+    const angle = car.driftAngle;
+    const spd   = car.speed;
+    const time  = this.driftTime;
+
+    let rating = '';
+    if (angle > 0.8 && spd > 30 && time > 2) {
+      rating = 'LEGENDARY';
+    } else if (angle > 0.55 && spd > 22 && time > 1.5) {
+      rating = 'INSANE';
+    } else if (angle > 0.35 && spd > 15 && time > 0.8) {
+      rating = 'GREAT';
+    } else if (angle > 0.2 && spd > 10) {
+      rating = 'GOOD';
+    }
+
+    if (rating && rating !== this.driftRating) {
+      this.driftRating = rating;
+      this.ratingTimer = 2.0;
+      this.ratingPulse = 1.0;
+    }
+  }
+
   _breakCombo() {
     if (this.multiplier > 1.5) {
       this.comboPopup = 1.5;
@@ -107,6 +169,8 @@ class DriftScoring {
     this.comboTimer  = 0;
     this.isDrifting  = false;
     this.driftTime   = 0;
+    this.driftRating = '';
+    this._comboStepCurrent = CFG.DRIFT.comboStep;
   }
 
   /* Format lap time ms → "1:23.456" */

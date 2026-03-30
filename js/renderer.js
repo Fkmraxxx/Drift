@@ -1,6 +1,6 @@
 /* ============================================================
    DRIFT KING — Canvas 2D Renderer
-   Draws track, effects, and car each frame
+   Draws track, effects, car, speed lines each frame
    ============================================================ */
 
 class Renderer {
@@ -44,6 +44,11 @@ class Renderer {
     this._drawCar(ctx, car, track.accentColor);
 
     ctx.restore();
+
+    /* 6. Speed lines (screen-space overlay) */
+    if (car.speed > CFG.VFX.speedLineThreshold) {
+      this._drawSpeedLines(ctx, W, H, car);
+    }
   }
 
   /* ── Background ─────────────────────────────────────────── */
@@ -269,6 +274,35 @@ class Renderer {
       ctx.shadowColor = 'transparent';
     }
 
+    /* Nitro glow (blue/purple fire when boosting) */
+    if (car.nitroActive) {
+      ctx.shadowColor = '#6600ff';
+      ctx.shadowBlur  = 18;
+      ctx.strokeStyle = 'rgba(100,0,255,0.6)';
+      ctx.lineWidth   = 0.15;
+      ctx.beginPath();
+      ctx.moveTo(-W * 0.9, -L);
+      ctx.lineTo( W * 0.9, -L);
+      ctx.lineTo( W,        L * 0.1);
+      ctx.lineTo( W * 0.85, L);
+      ctx.lineTo(-W * 0.85, L);
+      ctx.lineTo(-W,        L * 0.1);
+      ctx.closePath(); ctx.stroke();
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+
+      /* Exhaust glow */
+      const flicker = 0.7 + Math.random() * 0.3;
+      ctx.fillStyle = `rgba(100,50,255,${0.5 * flicker})`;
+      ctx.shadowColor = '#6600ff';
+      ctx.shadowBlur = 12;
+      ctx.beginPath();
+      ctx.ellipse(0, L + 0.3, W * 0.3, 0.5 * flicker, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+    }
+
     ctx.restore();
   }
 
@@ -293,6 +327,39 @@ class Renderer {
     /* Rear */
     drawWheel(-W * 0.9,  L * 0.62, 0);
     drawWheel( W * 0.9,  L * 0.62, 0);
+  }
+
+  /* ── Speed Lines (screen-space overlay) ──────────────────── */
+  _drawSpeedLines(ctx, W, H, car) {
+    const t = (car.speed - CFG.VFX.speedLineThreshold) /
+              (CFG.CAR.maxSpeed - CFG.VFX.speedLineThreshold);
+    const intensity = Math.min(1, Math.max(0, t));
+    if (intensity <= 0) return;
+
+    const cx = W / 2, cy = H / 2;
+    const lineCount = Math.floor(8 + intensity * 20);
+    const maxR = Math.sqrt(cx * cx + cy * cy);
+
+    ctx.save();
+    ctx.globalAlpha = intensity * 0.35;
+
+    for (let i = 0; i < lineCount; i++) {
+      const angle = (i / lineCount) * Math.PI * 2 + performance.now() * 0.0003;
+      const r1 = maxR * (0.4 + Math.random() * 0.2);
+      const r2 = maxR * (0.75 + Math.random() * 0.25);
+
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(angle) * r1, cy + Math.sin(angle) * r1);
+      ctx.lineTo(cx + Math.cos(angle) * r2, cy + Math.sin(angle) * r2);
+
+      const isNitro = car.nitroActive;
+      ctx.strokeStyle = isNitro ? 'rgba(100,50,255,0.6)' : 'rgba(255,255,255,0.4)';
+      ctx.lineWidth   = 1 + intensity * 2;
+      ctx.stroke();
+    }
+
+    ctx.globalAlpha = 1;
+    ctx.restore();
   }
 
   /* ── Minimap ──────────────────────────────────────────────── */

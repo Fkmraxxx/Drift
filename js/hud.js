@@ -1,5 +1,6 @@
 /* ============================================================
    DRIFT KING — HUD (drawn on top of canvas, HTML overlay)
+   With drift ratings, nitro bar, and near-miss indicators
    ============================================================ */
 
 const HUD = (() => {
@@ -20,6 +21,9 @@ const HUD = (() => {
       lapCount:    document.getElementById('hud-lap-count'),
       rpmGauge:    document.getElementById('hud-rpm-canvas'),
       minimap:     document.getElementById('hud-minimap'),
+      nitroBar:    document.getElementById('hud-nitro-fill'),
+      driftRating: document.getElementById('hud-drift-rating'),
+      nearMiss:    document.getElementById('hud-near-miss'),
     };
   }
 
@@ -68,6 +72,50 @@ const HUD = (() => {
     /* Minimap */
     if (renderer && _els.minimap) {
       renderer.drawMinimap(_els.minimap, track, car);
+    }
+
+    /* Nitro bar */
+    if (_els.nitroBar) {
+      const pct = (car.nitro / CFG.NITRO.maxCharge) * 100;
+      _els.nitroBar.style.width = pct + '%';
+      if (car.nitroActive) {
+        _els.nitroBar.style.background = 'linear-gradient(90deg, #6600ff, #cc44ff)';
+        _els.nitroBar.style.boxShadow = '0 0 8px #6600ff';
+      } else {
+        _els.nitroBar.style.background = 'linear-gradient(90deg, #00aaff, #00ffcc)';
+        _els.nitroBar.style.boxShadow = '0 0 4px #00aaff';
+      }
+    }
+
+    /* Drift rating popup */
+    if (_els.driftRating) {
+      if (scoring.ratingTimer > 0 && scoring.driftRating) {
+        _els.driftRating.textContent = scoring.driftRating + '!';
+        _els.driftRating.classList.remove('hidden');
+        const colors = {
+          'GOOD': '#00ddff',
+          'GREAT': '#ffdd00',
+          'INSANE': '#ff5500',
+          'LEGENDARY': '#ff00ff',
+        };
+        _els.driftRating.style.color = colors[scoring.driftRating] || '#fff';
+        _els.driftRating.style.textShadow = `0 0 12px ${colors[scoring.driftRating] || '#fff'}`;
+        const scale = 1 + Math.max(0, scoring.ratingTimer - 1.5) * 0.8;
+        _els.driftRating.style.transform = `scale(${scale})`;
+        _els.driftRating.style.opacity = Math.min(1, scoring.ratingTimer / 0.5);
+      } else {
+        _els.driftRating.classList.add('hidden');
+      }
+    }
+
+    /* Near-miss indicator */
+    if (_els.nearMiss) {
+      if (scoring.nearMissTimer > 0) {
+        _els.nearMiss.classList.remove('hidden');
+        _els.nearMiss.style.opacity = Math.min(1, scoring.nearMissTimer / 0.3);
+      } else {
+        _els.nearMiss.classList.add('hidden');
+      }
     }
   }
 

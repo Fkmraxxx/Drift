@@ -181,6 +181,34 @@ const T2_CTRL = [
   [ -6,   4],   // 19
 ];
 
+/*  Track 3 — "Mountain Pass"
+    High-speed flowing circuit, 22-point loop, ~650 m, 14 m wide
+    Long sweepers with elevation feel, great for drift chains */
+const T3_CTRL = [
+  [  0,   0],   //  0  Start / Finish
+  [ 80,  -5],   //  1  Long straight
+  [170, -15],   //  2  Straight continues
+  [240, -45],   //  3  Fast right entry
+  [290,-100],   //  4  Right sweep
+  [310,-170],   //  5  Right apex
+  [295,-235],   //  6  Exit to back straight
+  [240,-280],   //  7  Left kink
+  [175,-300],   //  8  Back straight
+  [100,-295],   //  9  Left sweep entry
+  [ 40,-265],   // 10  Left apex
+  [  5,-215],   // 11  Switchback
+  [ 25,-160],   // 12  Right hairpin entry
+  [ 70,-125],   // 13  Hairpin apex
+  [ 55, -80],   // 14  Hairpin exit
+  [ 15, -50],   // 15  Downhill section
+  [-30, -20],   // 16  Left sweep
+  [-55,  30],   // 17  S-curve entry
+  [-40,  75],   // 18  S-curve mid
+  [-15, 105],   // 19  S-curve exit
+  [ 20, 100],   // 20  Final corner
+  [ 15,  50],   // 21  Approach finish
+];
+
 /* ── Build & export ────────────────────────────────────────── */
 
 function makeTrack(id, name, ctrl, width, roadColor, accentColor, surface) {
@@ -202,4 +230,5 @@ function makeTrack(id, name, ctrl, width, roadColor, accentColor, surface) {
 const TRACKS = [
   makeTrack('neon',       'Neon Circuit',       T1_CTRL, 13, '#1c1c2e', '#00aaff'),
   makeTrack('industrial', 'Industrial Complex', T2_CTRL, 11, '#22201a', '#ff8800'),
+  makeTrack('mountain',   'Mountain Pass',      T3_CTRL, 14, '#1a1e2a', '#cc44ff'),
 ];

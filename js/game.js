@@ -23,6 +23,7 @@
   let _accumulator = 0;
   let _gameTime   = 0;   // ms, pauses when paused
   let _rafId      = null;
+  let _prevNitro  = false;
 
   /* ── Boot ─────────────────────────────────────────────────── */
   window.addEventListener('DOMContentLoaded', () => {
@@ -57,6 +58,7 @@
 
     _gameTime    = 0;
     _accumulator = 0;
+    _prevNitro   = false;
     gameState    = STATE.COUNTDOWN;
 
     /* Show game screen */
@@ -149,6 +151,9 @@
     /* Track collision */
     _handleTrackCollision();
 
+    /* Near-miss detection */
+    _detectNearMiss();
+
     /* Wall impact effects — must run BEFORE scoring.update clears wallHit */
     if (car.wallHit) {
       if (car.wallHitVel > 3) {
@@ -158,6 +163,17 @@
       }
       /* scoring.update will apply the penalty and clear the flag */
     }
+
+    /* Gear shift audio */
+    if (car.gearShifted) {
+      AudioManager.playGearShift();
+    }
+
+    /* Nitro start audio */
+    if (car.nitroActive && !_prevNitro) {
+      AudioManager.playNitroStart();
+    }
+    _prevNitro = car.nitroActive;
 
     /* Lap tracking */
     const completed = lapTracker.update(car.trackIdx, performance.now());
@@ -176,7 +192,16 @@
     if (!car.isDrifting && !car.brakeInput) tireMarks.breakLine();
 
     if (car.isDrifting && car.speed > CFG.DRIFT.minSpeed) {
-      particles.emitSmoke(car, Math.ceil(2 * markIntensity));
+      particles.emitSmoke(car, Math.ceil(3 * markIntensity));
+      /* Drift sparks from tire scraping */
+      if (car.driftAngle > 0.3 && Math.random() < 0.4) {
+        particles.emitDriftSparks(car, Math.ceil(2 * markIntensity));
+      }
+    }
+
+    /* Nitro flames */
+    if (car.nitroActive) {
+      particles.emitNitroFlame(car, 3);
     }
 
     /* Reset */
@@ -185,6 +210,17 @@
       tireMarks.breakLine();
       scoring._breakCombo();
     }
+  }
+
+  /* ── Near-miss detection ─────────────────────────────────────── */
+  function _detectNearMiss() {
+    const geo = track.geo;
+    const latDist = Math.abs(lateralDist(geo, car.x, car.y, car.trackIdx));
+    const halfW = geo.width / 2;
+    const margin = halfW - latDist;
+
+    car.nearMiss = car.isDrifting && margin > 0 && margin < CFG.DRIFT.nearMissDist;
+    car.nearMissDist = margin;
   }
 
   /* ── Track collision ────────────────────────────────────────── */

@@ -62,13 +62,16 @@
         <div class="ctrl-row"><span>Throttle</span>              <span class="ctrl-key">↑ &nbsp;/&nbsp; W</span></div>
         <div class="ctrl-row"><span>Brake / Reverse</span>       <span class="ctrl-key">↓ &nbsp;/&nbsp; S</span></div>
         <div class="ctrl-row"><span>Handbrake</span>             <span class="ctrl-key">SPACE / SHIFT</span></div>
+        <div class="ctrl-row"><span>Nitro Boost</span>           <span class="ctrl-key">N / B</span></div>
         <div class="ctrl-row"><span>Reset Car</span>             <span class="ctrl-key">R</span></div>
         <div class="ctrl-row"><span>Pause</span>                 <span class="ctrl-key">ESC / P</span></div>
-        <div class="ctrl-row"><span>Gamepad (auto)</span>        <span class="ctrl-key">Left Stick · RT · LT · A</span></div>
+        <div class="ctrl-row"><span>Gamepad (auto)</span>        <span class="ctrl-key">Left Stick · RT · LT · A/X · B/Y</span></div>
       </div>
       <p style="opacity:.5;font-size:.85rem;margin-top:10px;">
         Drift = hold throttle + handbrake in a corner, then steer and counter-steer.<br>
-        Score multiplier increases the longer you stay in a drift.
+        Score multiplier increases the longer you stay in a drift.<br>
+        Nitro recharges while drifting — use it on straights for maximum speed!<br>
+        Drift near walls for NEAR MISS bonus points!
       </p>
       <button id="btn-ctrl-back" class="btn back-btn">← BACK</button>
     </div>
@@ -109,6 +112,18 @@
         <div id="hud-gear-value">1</div>
         <div class="hud-label">GEAR</div>
       </div>
+
+      <!-- Nitro bar -->
+      <div id="hud-nitro">
+        <div class="hud-nitro-label">NITRO</div>
+        <div id="hud-nitro-bar"><div id="hud-nitro-fill"></div></div>
+      </div>
+
+      <!-- Drift rating popup (center screen) -->
+      <div id="hud-drift-rating" class="hidden"></div>
+
+      <!-- Near-miss indicator -->
+      <div id="hud-near-miss" class="hidden">⚡ NEAR MISS!</div>
 
       <!-- Bottom-right: RPM gauge -->
       <div id="hud-rpm">

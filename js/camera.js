@@ -1,6 +1,7 @@
 /* ============================================================
    DRIFT KING — Camera
-   Smooth chase camera with drift lead & speed zoom-out
+   Smooth chase camera with drift lead, speed zoom-out,
+   drift tilt, and impact shake
    ============================================================ */
 
 class Camera {
@@ -12,6 +13,7 @@ class Camera {
     this.shakeX = 0;
     this.shakeY = 0;
     this._shakeAmt = 0;
+    this.tilt   = 0;    // slight rotation during drift
   }
 
   /* Call each render frame (dt = real elapsed seconds) */
@@ -38,10 +40,17 @@ class Camera {
     while (dAngle < -Math.PI) dAngle += 2 * Math.PI;
     this.angle += dAngle * (1 - Math.pow(1 - C.lerpAngle, dt * 60));
 
-    /* Zoom: base − speed factor */
+    /* Zoom: base − speed factor (more aggressive for sense of speed) */
     const excess      = Math.max(0, vspd - 20);
-    const targetZoom  = C.baseZoom - C.speedZoom * excess;
-    this.zoom = lerp(this.zoom, Math.max(targetZoom, CFG.CAM.baseZoom * 0.55), 0.04);
+    const nitroExtra  = car.nitroActive ? 0.03 * excess : 0;
+    const targetZoom  = C.baseZoom - (C.speedZoom + nitroExtra) * excess;
+    this.zoom = lerp(this.zoom, Math.max(targetZoom, CFG.CAM.baseZoom * 0.45), 0.05);
+
+    /* Drift tilt — subtle lean into the slide direction */
+    const tiltTarget = car.isDrifting
+      ? car.steerInput * C.driftTilt * Math.min(car.driftAngle / 0.5, 1)
+      : 0;
+    this.tilt = lerp(this.tilt, tiltTarget, 0.06);
 
     /* Screen shake */
     if (this._shakeAmt > 0.01) {
@@ -62,7 +71,7 @@ class Camera {
   applyTransform(ctx, canvasW, canvasH) {
     ctx.translate(canvasW / 2 + this.shakeX, canvasH / 2 + this.shakeY);
     ctx.scale(this.zoom, this.zoom);
-    ctx.rotate(-this.angle - Math.PI / 2);   // car faces "up" on screen
+    ctx.rotate(-this.angle - Math.PI / 2 + this.tilt);
     ctx.translate(-this.x, -this.y);
   }
 
@@ -71,5 +80,6 @@ class Camera {
     this.x = x; this.y = y; this.angle = angle;
     this.zoom = CFG.CAM.baseZoom;
     this._shakeAmt = 0;
+    this.tilt = 0;
   }
 }
