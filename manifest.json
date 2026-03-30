@@ -1,0 +1,11 @@
+{
+  "name": "Drift King",
+  "short_name": "DriftKing",
+  "description": "Neon drift racing game — master the art of the slide",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#040608",
+  "theme_color": "#040608",
+  "icons": []
+}

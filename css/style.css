@@ -1,0 +1,474 @@
+/* ============================================================
+   DRIFT KING — Styles
+   Neon dark racing aesthetic
+   ============================================================ */
+
+/* ── Fonts ─────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&display=swap');
+
+/* ── Reset ─────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --neon:    #00ffcc;
+  --neon2:   #0088ff;
+  --danger:  #ff3333;
+  --gold:    #ffdd00;
+  --dark:    #07090f;
+  --darker:  #040608;
+  --panel:   rgba(5, 8, 18, 0.88);
+  --border:  rgba(0, 255, 204, 0.25);
+  --text:    #e8eef8;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--darker);
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 16px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ── Screen system ─────────────────────────────────────────── */
+.screen {
+  display: none;
+  position: fixed; inset: 0;
+  z-index: 10;
+}
+.screen.active { display: flex; }
+
+/* ── Game canvas ───────────────────────────────────────────── */
+#screen-game {
+  flex-direction: column;
+}
+#game-canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  display: block;
+  z-index: 0;
+}
+
+/* ── HUD ───────────────────────────────────────────────────── */
+#hud {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* Speed readout — bottom-left */
+#hud-speed {
+  position: absolute; bottom: 22px; left: 24px;
+  text-align: center;
+}
+#hud-speed-value {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(40px, 6vw, 72px);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+  text-shadow: 0 0 18px var(--neon);
+}
+.hud-unit { font-size: 0.4em; color: rgba(255,255,255,0.55); letter-spacing: 2px; }
+
+/* Gear — bottom-right near speed */
+#hud-gear {
+  position: absolute; bottom: 28px; left: 160px;
+  text-align: center;
+}
+#hud-gear-value {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(28px, 4vw, 50px);
+  font-weight: 700;
+  color: var(--neon);
+  text-shadow: 0 0 14px var(--neon);
+  line-height: 1;
+}
+.hud-label { font-size: 0.55em; color: rgba(255,255,255,0.4); letter-spacing: 3px; }
+
+/* RPM gauge — bottom right */
+#hud-rpm {
+  position: absolute; bottom: 12px; right: 20px;
+}
+#hud-rpm-canvas { display: block; }
+
+/* Lap info — top right */
+#hud-lap {
+  position: absolute; top: 18px; right: 22px;
+  text-align: right;
+}
+#hud-lap-time {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(18px, 2.5vw, 28px);
+  font-weight: 700;
+  color: #fff;
+}
+#hud-best-lap {
+  font-size: clamp(11px, 1.4vw, 16px);
+  color: var(--neon);
+  opacity: 0.75;
+  margin-top: 2px;
+}
+#hud-lap-count {
+  font-size: clamp(13px, 1.6vw, 20px);
+  color: rgba(255,255,255,0.6);
+  margin-top: 4px;
+  letter-spacing: 2px;
+}
+
+/* Score — top-left */
+#hud-score {
+  position: absolute; top: 16px; left: 22px;
+}
+#hud-score-value {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(20px, 3vw, 38px);
+  font-weight: 700;
+  color: var(--gold);
+  text-shadow: 0 0 14px var(--gold);
+}
+#hud-combo-value {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(16px, 2vw, 26px);
+  font-weight: 700;
+  color: var(--neon2);
+  text-shadow: 0 0 12px var(--neon2);
+  min-height: 1.2em;
+}
+
+/* Drift indicator */
+#hud-drift-ind {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(12px, 1.8vw, 22px);
+  font-weight: 700;
+  color: var(--neon);
+  letter-spacing: 3px;
+  text-shadow: 0 0 18px var(--neon);
+  margin-top: 6px;
+  transition: opacity 0.1s;
+}
+#hud-drift-ind.hidden { display: none; }
+
+/* Minimap — bottom centre-right */
+#hud-minimap-wrap {
+  position: absolute;
+  bottom: 18px;
+  right: 150px;
+  width: 130px; height: 130px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgba(0,0,0,0.5);
+  box-shadow: 0 0 16px rgba(0,255,204,0.15);
+}
+#hud-minimap {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+}
+
+/* Countdown overlay */
+#hud-countdown {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none;
+  z-index: 20;
+}
+#hud-countdown.hidden { display: none; }
+
+.countdown-num {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(80px, 18vw, 200px);
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 40px var(--neon), 0 0 80px var(--neon2);
+  opacity: 0;
+  transform: scale(1.4);
+}
+.countdown-num.countdown-pop {
+  animation: countPop 0.75s ease-out forwards;
+}
+.countdown-num.go {
+  color: var(--neon);
+  text-shadow: 0 0 60px var(--neon);
+}
+@keyframes countPop {
+  0%   { opacity: 0; transform: scale(1.6); }
+  20%  { opacity: 1; transform: scale(1);   }
+  80%  { opacity: 1; transform: scale(1);   }
+  100% { opacity: 0; transform: scale(0.8); }
+}
+
+/* Pause panel */
+#pause-panel {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(4px);
+  z-index: 30;
+}
+#pause-panel.hidden { display: none; }
+.pause-box {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 40px 56px;
+  text-align: center;
+  box-shadow: 0 0 40px rgba(0,255,204,0.12);
+}
+.pause-box h2 {
+  font-family: 'Orbitron', monospace;
+  font-size: 2rem;
+  color: var(--neon);
+  text-shadow: 0 0 20px var(--neon);
+  margin-bottom: 28px;
+  letter-spacing: 4px;
+}
+
+/* Race-end panel */
+#race-end-panel {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.72);
+  backdrop-filter: blur(6px);
+  z-index: 30;
+}
+#race-end-panel.hidden { display: none; }
+.race-end-box {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 40px 52px;
+  min-width: 340px;
+  text-align: center;
+  box-shadow: 0 0 60px rgba(0,255,204,0.15);
+}
+.race-end-box h2 {
+  font-family: 'Orbitron', monospace;
+  font-size: 2rem;
+  color: var(--gold);
+  text-shadow: 0 0 20px var(--gold);
+  margin-bottom: 24px;
+  letter-spacing: 3px;
+}
+.stat-row {
+  display: flex; justify-content: space-between;
+  padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.07);
+  font-size: 1.1rem; color: rgba(255,255,255,0.8);
+}
+.stat-val {
+  font-family: 'Orbitron', monospace;
+  color: var(--neon);
+  font-weight: 700;
+}
+.new-record {
+  margin-top: 14px;
+  font-family: 'Orbitron', monospace;
+  font-size: 1rem;
+  color: var(--gold);
+  text-shadow: 0 0 12px var(--gold);
+  letter-spacing: 2px;
+}
+
+/* ── Menu screen ───────────────────────────────────────────── */
+#screen-menu {
+  align-items: center; justify-content: center;
+  background: var(--darker);
+  overflow: hidden;
+}
+
+.menu-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%,  rgba(0,136,255,0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 80% at 10% 90%, rgba(0,255,204,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* Moving grid lines on menu */
+.menu-bg::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,255,204,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,204,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: gridScroll 8s linear infinite;
+}
+@keyframes gridScroll {
+  0%   { background-position: 0 0; }
+  100% { background-position: 60px 60px; }
+}
+
+.menu-content {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 32px;
+}
+
+.game-title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(52px, 9vw, 110px);
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 8px;
+  text-shadow:
+    0 0 20px var(--neon),
+    0 0 60px var(--neon),
+    0 0 100px rgba(0,255,204,0.4);
+  animation: titlePulse 3s ease-in-out infinite alternate;
+}
+.game-subtitle {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(14px, 2vw, 22px);
+  letter-spacing: 8px;
+  color: var(--neon2);
+  opacity: 0.85;
+  margin-top: -20px;
+}
+@keyframes titlePulse {
+  from { text-shadow: 0 0 20px var(--neon), 0 0 60px var(--neon),  0 0 100px rgba(0,255,204,0.35); }
+  to   { text-shadow: 0 0 30px var(--neon), 0 0 90px var(--neon2), 0 0 140px rgba(0,136,255,0.5);  }
+}
+
+.menu-buttons {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  width: 280px;
+}
+
+.best-scores {
+  text-align: center;
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+.best-row { margin: 4px 0; }
+.best-track { color: var(--neon2); margin-right: 8px; }
+.best-info  { color: var(--gold); }
+
+/* ── Generic button ─────────────────────────────────────────── */
+.btn {
+  display: block; width: 100%;
+  padding: 14px 24px;
+  font-family: 'Orbitron', monospace;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #fff;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.18s ease;
+  outline: none;
+}
+.btn:hover {
+  background: rgba(0,255,204,0.12);
+  border-color: var(--neon);
+  color: var(--neon);
+  box-shadow: 0 0 20px rgba(0,255,204,0.25);
+  transform: translateY(-1px);
+}
+.btn:active { transform: translateY(1px); }
+.btn.primary {
+  background: rgba(0,255,204,0.15);
+  border-color: var(--neon);
+  color: var(--neon);
+  box-shadow: 0 0 22px rgba(0,255,204,0.2);
+}
+.btn.primary:hover {
+  background: rgba(0,255,204,0.28);
+  box-shadow: 0 0 35px rgba(0,255,204,0.35);
+}
+.btn.inline { width: auto; display: inline-block; padding: 10px 20px; }
+
+/* ── Sub-screens shared layout ─────────────────────────────── */
+#screen-tracks, #screen-car, #screen-controls {
+  align-items: center; justify-content: center;
+  background: var(--darker);
+}
+.subscreen-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 40px 48px;
+  max-width: 700px; width: 94vw;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 0 60px rgba(0,255,204,0.08);
+  position: relative;
+}
+.subscreen-panel h2 {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  color: var(--neon);
+  text-shadow: 0 0 14px var(--neon);
+  letter-spacing: 4px;
+  margin-bottom: 28px;
+  text-align: center;
+}
+.back-btn { margin-top: 24px; }
+
+/* ── Track grid ─────────────────────────────────────────────── */
+.track-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 18px; margin-bottom: 8px;
+}
+.track-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.18s;
+  text-align: center;
+}
+.track-card:hover { border-color: var(--neon2); box-shadow: 0 0 18px rgba(0,136,255,0.2); }
+.track-card.selected { border-color: var(--neon); box-shadow: 0 0 24px rgba(0,255,204,0.25); }
+.track-preview {
+  display: block; width: 100%; height: auto;
+  border-radius: 6px; margin-bottom: 8px;
+}
+.track-name { font-family: 'Orbitron', monospace; font-size: 0.85rem; color: #fff; letter-spacing: 2px; }
+.track-info { font-size: 0.78rem; color: rgba(255,255,255,0.45); margin-top: 3px; }
+
+/* ── Settings ───────────────────────────────────────────────── */
+.setting-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+  gap: 16px;
+}
+.setting-label { font-weight: 600; letter-spacing: 1px; min-width: 140px; }
+.setting-control { display: flex; align-items: center; gap: 12px; flex: 1; }
+.setting-slider {
+  flex: 1; accent-color: var(--neon);
+  cursor: pointer; height: 4px;
+}
+.setting-val {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.9rem;
+  color: var(--neon);
+  min-width: 40px; text-align: right;
+}
+
+/* ── Controls list ──────────────────────────────────────────── */
+.controls-list { margin-bottom: 10px; }
+.ctrl-row {
+  display: flex; justify-content: space-between;
+  padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+  font-size: 1rem;
+}
+.ctrl-key {
+  font-family: 'Orbitron', monospace;
+  color: var(--neon);
+  font-size: 0.85rem;
+}
+
+/* ── Scrollbar ──────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ── Utility ─────────────────────────────────────────────────── */
+.hidden { display: none !important; }
