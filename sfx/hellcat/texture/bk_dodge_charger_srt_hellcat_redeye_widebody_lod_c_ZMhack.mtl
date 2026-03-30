@@ -1,0 +1,1042 @@
+newmtl Glass_int
+Ka 0.1 0.1 0.1
+Kd 0.1 0.1 0.1
+Ks 5 5 5
+Ns 430
+illum 2
+map_Kd texture\vitres_exterieur.dds
+
+newmtl tech-slide-5_lit
+Ka 0.4 0.4 0.4
+Kd 0.4 0.4 0.4
+Ks 5 5 5
+Ns 430
+illum 2
+map_Kd texture\tech-slide-5.dds
+bump texture\flat_nm.dds
+
+newmtl Mirror
+Ka 0.4 0.4 0.4
+Kd 0.45 0.45 0.45
+Ks 3 3 3
+Ns 450
+illum 2
+map_Kd texture\Mirror.dds
+
+newmtl INT_Plastic_NM
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\plastic.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_speaker_diff
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\speaker_diff.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_leather_perforated_third_paint
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\leather_2.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_moket2_third_paint
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\leather.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_alcnt
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\alcnt.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_belt_d
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\INT_Belt_D.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_fabric_roof_nr
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\fabric_roof_nr.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_carpet_black_dif
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\INT_Carpet_black_DIF.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_Plastic_ridges_008b_nrml
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\plastic.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_Plastic_Slush_blk_DIF
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\INT_Plastic_Slush_blk_DIF.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_Plastic_ridges_008b_nrml.001
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\plastic.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_plastic_leather_blk
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\plastic_leather_blk.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_plastic_leather_wht_diff_secondary_paint
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\leather_3.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl en_ridges_002b_nrml
+Ka 0.25 0.25 0.25
+Kd 0.35 0.35 0.35
+Ks 0.3 0.3 0.3
+Ns 160
+illum 2
+map_Kd texture\en.dds
+map_Ks texture\White.dds
+bump texture\flat_nm.dds
+
+newmtl INT_red1
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.3 0.3 0.3
+Ns 160
+illum 2
+map_Kd texture\red1.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_Plastic_Env
+Ka 0.35 0.35 0.35
+Kd 0.05 0.05 0.05
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\plastic.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_Chrome
+Ka 0.35 0.35 0.35
+Kd 0.05 0.05 0.05
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\chrome.png
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_carbon_fiber
+Ka 0.5 0.5 0.5
+Kd 0.05 0.05 0.05
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\carbon_fiber.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_Rubber
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.3 0.3 0.3
+Ns 160
+illum 2
+map_Kd texture\black.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_grill2
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\grill2.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_Plastic
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.3 0.3 0.3
+Ns 160
+illum 2
+map_Kd texture\plastic.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl frame
+Ka 0 0 0
+Kd 0 0 0
+Ks 0 0 0
+Ns 0
+illum 2
+map_Kd texture\underbody.dds
+
+newmtl srt_001
+Ka 0.35 0.35 0.35
+Kd 0.05 0.05 0.05
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\srt_001l.dds
+map_Ks texture\srt_001l.dds
+bump texture\srt_001_nrml.dds
+
+newmtl key_hole_002_int
+Ka 0.35 0.35 0.35
+Kd 0.05 0.05 0.05
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\key_hole_002.dds
+map_Ks texture\key_hole_002.dds
+bump texture\key_hole_002_nrml.dds
+
+newmtl dod_chargersrthellcat_15_symbols_embossed_opac_int
+Ka 0.25 0.25 0.25
+Kd 0.35 0.35 0.35
+Ks 0.3 0.3 0.3
+Ns 160
+illum 2
+map_Kd texture\dod_chargersrthellcat_15_symbols_embossed.dds
+map_Ks texture\dod_chargersrthellcat_15_symbols_embossed_opac - Copy.dds
+bump texture\dod_chargersrthellcat_15_symbols_embossed_nrml.dds
+
+newmtl stitch_009_glos_int
+Ka 0.25 0.25 0.25
+Kd 0.35 0.35 0.35
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\stitch_009_glos.dds
+
+newmtl dod_chargersrthellcat_15_symbols_diff_int_alpha_nolit
+Ka 0.25 0.25 0.25
+Kd 0.35 0.35 0.35
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\dod_chargersrthellcat_15_symbols_diff.dds
+
+newmtl dod_chargersrthellcat_15_symbols_diff_int_alpha_lit
+Ka 0.25 0.25 0.25
+Kd 0.35 0.35 0.35
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\dod_chargersrthellcat_15_symbols_diff.dds
+
+newmtl srt_008
+Ka 0.25 0.25 0.25
+Kd 0.35 0.35 0.35
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\srt_008.dds
+
+newmtl red_80_percent_alpha
+Ka 0.1 0.1 0.1
+Kd 0.1 0.1 0.1
+Ks 5 5 5
+Ns 430
+illum 2
+map_Kd texture\red_80_percent_alpha.dds
+
+newmtl Glass
+Ka 0.1 0.1 0.1
+Kd 0.1 0.1 0.1
+Ks 5 5 5
+Ns 430
+illum 2
+map_Kd texture\vitres_exterieur.dds
+
+newmtl EXT_Plastic_extra
+Ka 0.3 0.3 0.3
+Kd 0.3 0.3 0.3
+Ks 0.5 0.5 0.5
+Ns 60
+illum 2
+map_Kd texture\plastic.dds
+map_Ks texture\EXT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl SKIN_00
+Ka 0.4 0.4 0.4
+Kd 0.45 0.45 0.45
+Ks 0.8 0.8 0.8
+Ns 80
+illum 2
+map_Kd texture\car_paint.dds
+map_Ks texture\SKIN_00.dds
+bump texture\flat_nm.dds
+
+newmtl INT_Chrome_eng
+Ka 0.35 0.35 0.35
+Kd 0.05 0.05 0.05
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\chrome.png
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_Rubber_ridges_008b_nrml
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.3 0.3 0.3
+Ns 160
+illum 2
+map_Kd texture\black.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_Chrome_ridges_002b_nrml
+Ka 0.35 0.35 0.35
+Kd 0.05 0.05 0.05
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\chrome.png
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_Plastic_ridges_002b_nrml
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\plastic.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_bluedark
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\bluedark.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_ORANGE_chrome
+Ka 0.35 0.35 0.35
+Kd 0.05 0.05 0.05
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\ORANGE.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_ORANGE
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\ORANGE.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl 000_screw_039_nrml
+Ka 0.35 0.35 0.35
+Kd 0.05 0.05 0.05
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\000.dds
+map_Ks texture\000.dds
+bump texture\screw_039_nrml.dds
+
+newmtl t6_belt_d_int
+Ka 0.25 0.25 0.25
+Kd 0.35 0.35 0.35
+Ks 0.3 0.3 0.3
+Ns 160
+illum 2
+map_Kd texture\t6_belt_d.dds
+map_Ks texture\t6_belt_d.dds
+bump texture\t6_belt_n.dds
+
+newmtl screw_017_int
+Ka 0.35 0.35 0.35
+Kd 0.05 0.05 0.05
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\screw_017.dds
+map_Ks texture\screw_017.dds
+bump texture\screw_017_nrml.dds
+
+newmtl dod_chargersrthellcat_15_doortags_diff_alpha
+Ka 0.25 0.25 0.25
+Kd 0.25 0.25 0.25
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\dod_chargersrthellcat_15_doortags_diff.dds
+
+newmtl INT_plastic_dtl_weave_004_nrml
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\plastic.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_bluedark_env
+Ka 0.35 0.35 0.35
+Kd 0.05 0.05 0.05
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\bluedark.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl SKIN_01
+Ka 0.4 0.4 0.4
+Kd 0.45 0.45 0.45
+Ks 0.8 0.8 0.8
+Ns 80
+illum 2
+map_Kd texture\car_paint.dds
+map_Ks texture\SKIN_01.dds
+bump texture\flat_nm.dds
+
+newmtl INT_Plastic_Headlight_Reflector_Normal
+Ka 0 0 0
+Kd 0.564706 0.564706 0.564706
+Ks 1 1 1
+Ns 10
+illum 2
+map_Kd texture\black.dds
+
+newmtl INT_red1_dtl_weave_004_nrml
+Ka 0 0 0
+Kd 0.564706 0.564706 0.564706
+Ks 1 1 1
+Ns 10
+illum 2
+map_Kd texture\red1.dds
+
+newmtl rgb140_weld_002_nrm
+Ka 0 0 0
+Kd 0.564706 0.564706 0.564706
+Ks 1 1 1
+Ns 10
+illum 2
+map_Kd texture\rgb140.dds
+
+newmtl black_screw_039_nrml
+Ka 0.35 0.35 0.35
+Kd 0.05 0.05 0.05
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\black.dds
+map_Ks texture\black.dds
+bump texture\screw_039_nrml.dds
+
+newmtl rivet_0_int
+Ka 0.35 0.35 0.35
+Kd 0.05 0.05 0.05
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\rivet_0.dds
+
+newmtl capsule_016_opac_int
+Ka 0.25 0.25 0.25
+Kd 0.35 0.35 0.35
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\capsule_016_opac - Copy - Copy (2).dds
+
+newmtl hole_int
+Ka 0.25 0.25 0.25
+Kd 0.35 0.35 0.35
+Ks 0.3 0.3 0.3
+Ns 160
+illum 2
+map_Kd texture\hole.dds
+
+newmtl charger_005_int
+Ka 0.25 0.25 0.25
+Kd 0.35 0.35 0.35
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\charger_005.dds
+
+newmtl black_30_percent_alpha
+Ka 0.1 0.1 0.1
+Kd 0.1 0.1 0.1
+Ks 5 5 5
+Ns 430
+illum 2
+map_Kd texture\black_30_percent_alpha.dds
+
+newmtl light1
+Ka 0.3 0.3 0.3
+Kd 0.1 0.1 0.1
+Ks 0.2 0.2 0.2
+Ns 10
+illum 2
+map_Kd texture\light1.dds
+bump texture\light1_NORM.dds
+
+newmtl vehicle_generic_detail2
+Ka 0.1 0.1 0.1
+Kd 0.1 0.1 0.1
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\vehicle_generic_detail2.dds
+bump texture\vehicle_generic_detail2_normal.dds
+
+newmtl dod_chargersrthellcat_15_gauges_diff
+Ka 0.25 0.25 0.25
+Kd 0.25 0.25 0.25
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\dod_chargersrthellcat_15_gauges_diff.dds
+
+newmtl EXT_Glass
+Ka 0.1 0.1 0.1
+Kd 0.1 0.1 0.1
+Ks 5 5 5
+Ns 430
+illum 2
+map_Kd texture\ext_glass.dds
+
+newmtl tailred
+Ka 0.3 0.3 0.3
+Kd 0.1 0.1 0.1
+Ks 0.2 0.2 0.2
+Ns 10
+illum 2
+map_Kd texture\tailred.dds
+bump texture\t_NORM.dds
+
+newmtl EXT_Plastic
+Ka 0.3 0.3 0.3
+Kd 0.3 0.3 0.3
+Ks 0.5 0.5 0.5
+Ns 60
+illum 2
+map_Kd texture\plastic.dds
+map_Ks texture\EXT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl t
+Ka 0.3 0.3 0.3
+Kd 0.1 0.1 0.1
+Ks 0.2 0.2 0.2
+Ns 10
+illum 2
+map_Kd texture\t.dds
+bump texture\t_NORM.dds
+
+newmtl EXT_grillepl1
+Ka 0.3 0.3 0.3
+Kd 0.3 0.3 0.3
+Ks 0.7 0.7 0.7
+Ns 140
+illum 2
+map_Kd texture\grillepl1.dds
+map_Ks texture\EXT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl EXT_Red
+Ka 0.3 0.3 0.3
+Kd 0.3 0.3 0.3
+Ks 0.5 0.5 0.5
+Ns 60
+illum 2
+map_Kd texture\red1.dds
+map_Ks texture\EXT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl EXT_Plastic_env
+Ka 0.1 0.1 0.1
+Kd 0.1 0.1 0.1
+Ks 0.7 0.7 0.7
+Ns 140
+illum 2
+map_Kd texture\plastic.dds
+map_Ks texture\EXT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl EXT_Chrome
+Ka 0.3 0.3 0.3
+Kd 0.3 0.3 0.3
+Ks 0.7 0.7 0.7
+Ns 140
+illum 2
+map_Kd texture\chrome.png
+map_Ks texture\EXT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl indi
+Ka 0.3 0.3 0.3
+Kd 0.1 0.1 0.1
+Ks 0.2 0.2 0.2
+Ns 10
+illum 2
+map_Kd texture\indi.dds
+bump texture\indi_NORM.dds
+
+newmtl EXT_Redeye
+Ka 0.4 0.4 0.4
+Kd 0.4 0.4 0.4
+Ks 0.7 0.7 0.7
+Ns 140
+illum 2
+map_Kd texture\red1.dds
+map_Ks texture\EXT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl Headlight_Reflector
+Ka 0.3 0.3 0.3
+Kd 0.1 0.1 0.1
+Ks 0.2 0.2 0.2
+Ns 10
+illum 2
+map_Kd texture\Headlight_Reflector.dds
+bump texture\Headlight_Reflector_Normal.dds
+
+newmtl light
+Ka 0.3 0.3 0.3
+Kd 0.1 0.1 0.1
+Ks 0.2 0.2 0.2
+Ns 10
+illum 2
+map_Kd texture\light.dds
+bump texture\light_NORM.dds
+
+newmtl chrome
+Ka 0.1 0.1 0.1
+Kd 0.1 0.1 0.1
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\chrome.png
+
+newmtl EXT_Chrome_hellcat
+Ka 0.3 0.3 0.3
+Kd 0.3 0.3 0.3
+Ks 0.7 0.7 0.7
+Ns 140
+illum 2
+map_Kd texture\chrome_hellcat_badge.png
+map_Ks texture\EXT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl EXT_Black_Glass
+Ka 0.1 0.1 0.1
+Kd 0.1 0.1 0.1
+Ks 0.7 0.7 0.7
+Ns 140
+illum 2
+map_Kd texture\black.dds
+map_Ks texture\EXT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl undercarriage_001_diff
+Ka 0.1 0.1 0.1
+Kd 0.1 0.1 0.1
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\underbody.dds
+map_Ks texture\underbody.dds
+bump texture\underbody_NORM.dds
+
+newmtl EXT_Rubber
+Ka 0.1 0.1 0.1
+Kd 0.1 0.1 0.1
+Ks 0.05 0.05 0.05
+Ns 60
+illum 2
+map_Kd texture\black.dds
+map_Ks texture\EXT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl black
+Ka 0 0 0
+Kd 0.64 0.64 0.64
+Ks 1 1 1
+Ns 10
+illum 2
+map_Kd texture\black.dds
+
+newmtl INTERNAL_glass
+Ka 0.4 0.4 0.4
+Kd 0.4 0.4 0.4
+Ks 0 0 0
+Ns 10
+illum 2
+map_Kd texture\INTERNAL_glass.dds
+
+newmtl INTEXT_Plastic
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.3 0.3 0.3
+Ns 160
+illum 2
+map_Kd texture\plastic.dds
+map_Ks texture\INTEXT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INTEXT_Chrome
+Ka 0.35 0.35 0.35
+Kd 0.05 0.05 0.05
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\chrome.png
+map_Ks texture\INTEXT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl defrostlines_002_opac
+Ka 0.25 0.25 0.25
+Kd 0.35 0.35 0.35
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\defrostlines_002_opac.dds
+
+newmtl tailred.003
+Ka 0.3 0.3 0.3
+Kd 0.1 0.1 0.1
+Ks 0.2 0.2 0.2
+Ns 10
+illum 2
+map_Kd texture\tailred.dds
+bump texture\t_NORM.dds
+
+newmtl dod_chargersrthellcat_15_gauges_lite
+Ka 0.25 0.25 0.25
+Kd 0.25 0.25 0.25
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\dod_chargersrthellcat_15_gauges_lite.dds
+
+newmtl dod_chargerfast7_15_tach_graphics
+Ka 0.25 0.25 0.25
+Kd 0.25 0.25 0.25
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\dod_chargerfast7_15_tach_graphics.dds
+
+newmtl EXT_Chrome_exh
+Ka 0.1 0.1 0.1
+Kd 0.1 0.1 0.1
+Ks 0.7 0.7 0.7
+Ns 140
+illum 2
+map_Kd texture\chrome.png
+map_Ks texture\EXT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl transparrent
+Ka 0.35 0.35 0.35
+Kd 0.05 0.05 0.05
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\transparrent.dds
+
+newmtl white_50_percent_alpha
+Ka 0.35 0.35 0.35
+Kd 0.05 0.05 0.05
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\vitres_interieur.dds
+
+newmtl pzero_black
+Ka 0.15 0.15 0.15
+Kd 0.2 0.2 0.2
+Ks 0.035 0.035 0.035
+Ns 6
+illum 2
+map_Kd texture\pzero_black.dds
+bump texture\pzero_nrm.dds
+
+newmtl Wheel_Front_Rims
+Ka 0.1 0.1 0.1
+Kd 0.1 0.1 0.1
+Ks 0.2 0.2 0.2
+Ns 180
+illum 2
+map_Kd texture\car_paint_rims.dds
+map_Ks texture\WHEEL_FRONT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl Wheel_Front_Chrome
+Ka 0.25 0.25 0.25
+Kd 0.25 0.25 0.25
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\chrome.png
+map_Ks texture\WHEEL_FRONT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl Brake_Disc
+Ka 0.2 0.2 0.2
+Kd 0.4 0.4 0.4
+Ks 0.5 0.5 0.5
+Ns 10
+illum 2
+map_Kd texture\Brake_Disk_D.png
+bump texture\Brake_Disk_N.png
+
+newmtl Wheel_Rear_Rims
+Ka 0.1 0.1 0.1
+Kd 0.1 0.1 0.1
+Ks 0.2 0.2 0.2
+Ns 180
+illum 2
+map_Kd texture\car_paint_rims.dds
+map_Ks texture\WHEEL_REAR_AO.dds
+bump texture\flat_nm.dds
+
+newmtl Wheel_Rear_Chrome
+Ka 0.25 0.25 0.25
+Kd 0.25 0.25 0.25
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\chrome.png
+map_Ks texture\WHEEL_REAR_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_Leather_Perforatedb
+Ka 0.5 0.5 0.5
+Kd 0.4 0.4 0.4
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\INT_Leather_Perforatedb.dds
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl INT_Chrome_matte
+Ka 0.35 0.35 0.35
+Kd 0.05 0.05 0.05
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\chrome.png
+map_Ks texture\INT_AO.dds
+bump texture\flat_nm.dds
+
+newmtl srt_02_int
+Ka 0.15 0.15 0.15
+Kd 0.05 0.05 0.05
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\srt_02_env.dds
+map_Ks texture\srt_02_env.dds
+bump texture\srt_02_nrml.dds
+
+newmtl stitch_00101_diff_int
+Ka 0.25 0.25 0.25
+Kd 0.35 0.35 0.35
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\stitch_00101_diff.dds
+
+newmtl dod_chargersrthellcat_15_doortags_diff_int_alpha
+Ka 0.25 0.25 0.25
+Kd 0.25 0.25 0.25
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\dod_chargersrthellcat_15_doortags_diff.dds
+
+newmtl Navigation
+Ka 0.1 0.1 0.1
+Kd 0.1 0.1 0.1
+Ks 5 5 5
+Ns 430
+illum 2
+map_Kd texture\black_matte_spec.png
+bump texture\flat_nm.dds
+
+newmtl stitch_003_glos_int_third_paint
+Ka 0.25 0.25 0.25
+Kd 0.35 0.35 0.35
+Ks 0.25 0.25 0.25
+Ns 40
+illum 2
+map_Kd texture\leather.dds
+map_Ks texture\stitch_003.dds
+bump texture\stitch_003_nrml.dds
+
+newmtl key_hole_002_ext
+Ka 0.35 0.35 0.35
+Kd 0.05 0.05 0.05
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\key_hole_002.dds
+map_Ks texture\key_hole_002.dds
+bump texture\key_hole_002_nrml.dds
+
+newmtl Plastic_int
+Ka 0.25 0.25 0.25
+Kd 0.35 0.35 0.35
+Ks 0.3 0.3 0.3
+Ns 160
+illum 2
+map_Kd texture\plastic.dds
+map_Ks texture\plastic.dds
+bump texture\flat_nm.dds
+
+newmtl red1_int
+Ka 0.25 0.25 0.25
+Kd 0.35 0.35 0.35
+Ks 0.3 0.3 0.3
+Ns 160
+illum 2
+map_Kd texture\plastic.dds
+map_Ks texture\red1.dds
+bump texture\flat_nm.dds
+
+newmtl BRAKE_Color
+Ka 0.3 0.3 0.3
+Kd 0.3 0.3 0.3
+Ks 0.3 0.3 0.3
+Ns 160
+illum 2
+map_Kd texture\caliper_detail.dds
+map_Ks texture\BRAKE_AO.dds
+bump texture\flat_nm.dds
+
+newmtl BRAKE_Chrome
+Ka 0.25 0.25 0.25
+Kd 0.25 0.25 0.25
+Ks 0.1 0.1 0.1
+Ns 15
+illum 2
+map_Kd texture\chrome.png
+map_Ks texture\BRAKE_AO.dds
+bump texture\flat_nm.dds
+
+newmtl BRAKE_Plastic
+Ka 0.3 0.3 0.3
+Kd 0.3 0.3 0.3
+Ks 0.3 0.3 0.3
+Ns 160
+illum 2
+map_Kd texture\plastic.dds
+map_Ks texture\BRAKE_AO.dds
+bump texture\flat_nm.dds
+
+newmtl brembo_005_ext
+Ka 0.3 0.3 0.3
+Kd 0.3 0.3 0.3
+Ks 0.3 0.3 0.3
+Ns 160
+illum 2
+map_Kd texture\brembo_005.dds
+
+newmtl EXT_PLATE
+Ka 0.2 0.2 0.2
+Kd 0.4 0.4 0.4
+Ks 0.2 0.2 0.2
+Ns 100
+illum 2
+map_Kd texture\Plate_D.dds
+bump texture\Plate_NM.dds
+
+newmtl __LodGenBlack
+Ka 0.25 0.25 0.25
+Kd 0.25 0.25 0.25
+Ks 0 0 0
+Ns 0
+illum 2
+
