@@ -28,7 +28,20 @@
   /* ── Boot ─────────────────────────────────────────────────── */
   window.addEventListener('DOMContentLoaded', () => {
     const canvas  = document.getElementById('game-canvas');
-    renderer      = new Renderer(canvas);
+
+    /* ── 2D / 3D renderer selection ─────────────────────────── */
+    const use3D = Storage.getSetting('render3d') !== false; // default to 3D
+    if (use3D && typeof Renderer3D !== 'undefined') {
+      try {
+        renderer = new Renderer3D(canvas);
+      } catch (e) {
+        console.warn('3D renderer failed, falling back to 2D:', e);
+        renderer = new Renderer(canvas);
+      }
+    } else {
+      renderer = new Renderer(canvas);
+    }
+
     input         = new InputManager();
     camera        = new Camera();
 
