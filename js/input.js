@@ -43,11 +43,11 @@ class InputManager {
     const k = this._keys;
     let steer = 0, throttle = 0, brake = 0, hb = false, nitro = false;
 
-    /* ── Keyboard ── */
-    if (k.has('ArrowLeft')  || k.has('KeyA')) steer    -= 1;
-    if (k.has('ArrowRight') || k.has('KeyD')) steer    += 1;
-    if (k.has('ArrowUp')    || k.has('KeyW')) throttle  = 1;
-    if (k.has('ArrowDown')  || k.has('KeyS')) brake     = 1;
+    /* ── Keyboard (QWERTY + AZERTY) ── */
+    if (k.has('ArrowLeft')  || k.has('KeyA') || k.has('KeyQ')) steer    -= 1;
+    if (k.has('ArrowRight') || k.has('KeyD'))                  steer    += 1;
+    if (k.has('ArrowUp')    || k.has('KeyW') || k.has('KeyZ')) throttle  = 1;
+    if (k.has('ArrowDown')  || k.has('KeyS'))                  brake     = 1;
     if (k.has('Space') || k.has('ShiftLeft') || k.has('ShiftRight')) hb = true;
     if (k.has('KeyN') || k.has('KeyB')) nitro = true;
 
