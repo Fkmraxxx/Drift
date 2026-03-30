@@ -25,7 +25,7 @@ class Vehicle {
     this.steerInput    = 0;
     this.throttleInput = 0;
     this.brakeInput    = 0;
-    this.handbrakein   = false;
+    this.handbrakeIn   = false;
 
     /* ── Derived / observable state ── */
     this.speed         = 0;   // |v| m/s
@@ -52,7 +52,7 @@ class Vehicle {
     this.vx = this.vy = this.angularVel = 0;
     this.gear = 1; this.rpm = CFG.CAR.minRPM;
     this.steerInput = this.throttleInput = this.brakeInput = 0;
-    this.handbrakein = false;
+    this.handbrakeIn = false;
     this.wallHit = false;
   }
 
@@ -66,7 +66,7 @@ class Vehicle {
     this.steerInput    = input.steer;
     this.throttleInput = input.throttle;
     this.brakeInput    = input.brake;
-    this.handbrakein   = input.handbrake;
+    this.handbrakeIn   = input.handbrake;
 
     /* ── Local velocity ── */
     const cosA = Math.cos(this.angle), sinA = Math.sin(this.angle);
@@ -94,7 +94,7 @@ class Vehicle {
 
     /* ── Tire forces (simplified Pacejka peak model) ── */
     const maxLat        = C.mass * g * 0.5;
-    const rearGripCoeff = this.handbrakein
+    const rearGripCoeff = this.handbrakeIn
                           ? C.handbrakeGrip
                           : this._gripMult;
 
