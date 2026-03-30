@@ -204,9 +204,9 @@ class Vehicle {
     /* ── Aerodynamic drag ── */
     if (spd > 0.01) {
       let dragMul = this.onTrack ? 1.0 : C.offroadDrag;
-      const drag = C.dragCoeff * dragMul * spd * spd;
-      this.vx -= drag * (this.vx / spd) * dt;
-      this.vy -= drag * (this.vy / spd) * dt;
+      const dragAccel = (C.dragCoeff * dragMul * spd * spd) / C.mass;
+      this.vx -= dragAccel * (this.vx / spd) * dt;
+      this.vy -= dragAccel * (this.vy / spd) * dt;
     }
 
     /* Rolling resistance */

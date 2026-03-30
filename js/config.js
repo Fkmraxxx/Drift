@@ -91,6 +91,6 @@ const CFG = {
     smokeLifetime:  2.0,     // s (increased)
     smokeSpeed:     3.5,     // m/s initial velocity
     sparkLifetime:  0.7,
-    speedLineThreshold: 40,  // m/s — start showing speed lines above this
+    speedLineThreshold: 28,  // m/s — start showing speed lines above this
   },
 };
