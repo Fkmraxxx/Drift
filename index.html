@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#040608" />
+  <title>DRIFT KING</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SCREEN: MAIN MENU
+  ════════════════════════════════════════════════════════════ -->
+  <div id="screen-menu" class="screen active">
+    <div class="menu-bg"></div>
+    <div class="menu-content">
+      <h1 class="game-title">DRIFT KING</h1>
+      <p class="game-subtitle">MASTER THE ART OF THE SLIDE</p>
+      <div class="menu-buttons">
+        <button id="btn-play"     class="btn primary">▶  RACE</button>
+        <button id="btn-tracks"   class="btn">TRACK SELECT</button>
+        <button id="btn-car"      class="btn">CAR SETUP</button>
+        <button id="btn-controls" class="btn">CONTROLS</button>
+        <button id="btn-fullscreen" class="btn">⛶  FULLSCREEN</button>
+      </div>
+      <div id="best-scores" class="best-scores"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SCREEN: TRACK SELECT
+  ════════════════════════════════════════════════════════════ -->
+  <div id="screen-tracks" class="screen">
+    <div class="subscreen-panel">
+      <h2>SELECT TRACK</h2>
+      <div id="track-grid" class="track-grid"></div>
+      <button id="btn-track-back" class="btn back-btn">← BACK</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SCREEN: CAR SETUP
+  ════════════════════════════════════════════════════════════ -->
+  <div id="screen-car" class="screen">
+    <div class="subscreen-panel">
+      <h2>CAR SETUP</h2>
+      <div id="settings-grid"></div>
+      <button id="btn-car-back" class="btn back-btn">← BACK</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SCREEN: CONTROLS
+  ════════════════════════════════════════════════════════════ -->
+  <div id="screen-controls" class="screen">
+    <div class="subscreen-panel">
+      <h2>CONTROLS</h2>
+      <div class="controls-list">
+        <div class="ctrl-row"><span>Steer Left / Right</span>   <span class="ctrl-key">← → &nbsp;/&nbsp; A D</span></div>
+        <div class="ctrl-row"><span>Throttle</span>              <span class="ctrl-key">↑ &nbsp;/&nbsp; W</span></div>
+        <div class="ctrl-row"><span>Brake / Reverse</span>       <span class="ctrl-key">↓ &nbsp;/&nbsp; S</span></div>
+        <div class="ctrl-row"><span>Handbrake</span>             <span class="ctrl-key">SPACE / SHIFT</span></div>
+        <div class="ctrl-row"><span>Reset Car</span>             <span class="ctrl-key">R</span></div>
+        <div class="ctrl-row"><span>Pause</span>                 <span class="ctrl-key">ESC / P</span></div>
+        <div class="ctrl-row"><span>Gamepad (auto)</span>        <span class="ctrl-key">Left Stick · RT · LT · A</span></div>
+      </div>
+      <p style="opacity:.5;font-size:.85rem;margin-top:10px;">
+        Drift = hold throttle + handbrake in a corner, then steer and counter-steer.<br>
+        Score multiplier increases the longer you stay in a drift.
+      </p>
+      <button id="btn-ctrl-back" class="btn back-btn">← BACK</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SCREEN: GAME
+  ════════════════════════════════════════════════════════════ -->
+  <div id="screen-game" class="screen">
+
+    <!-- Canvas -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- HUD (HTML layer, pointer-events none) -->
+    <div id="hud">
+
+      <!-- Top-left: Score & Combo -->
+      <div id="hud-score">
+        <div style="font-size:.65em;letter-spacing:3px;opacity:.55;margin-bottom:2px;">SCORE</div>
+        <div id="hud-score-value">0</div>
+        <div id="hud-combo-value"></div>
+        <div id="hud-drift-ind" class="hidden">DRIFTING</div>
+      </div>
+
+      <!-- Top-right: Lap info -->
+      <div id="hud-lap" style="position:absolute;top:18px;right:22px;text-align:right;">
+        <div id="hud-lap-count" style="font-family:'Orbitron',monospace;font-size:clamp(11px,1.4vw,16px);opacity:.55;letter-spacing:2px;">LAP 1 / 3</div>
+        <div id="hud-lap-time">0:00.000</div>
+        <div id="hud-best-lap">BEST --</div>
+      </div>
+
+      <!-- Bottom-left: Speed & Gear -->
+      <div id="hud-speed">
+        <div id="hud-speed-value">0</div>
+        <div class="hud-unit">KM/H</div>
+      </div>
+      <div id="hud-gear">
+        <div id="hud-gear-value">1</div>
+        <div class="hud-label">GEAR</div>
+      </div>
+
+      <!-- Bottom-right: RPM gauge -->
+      <div id="hud-rpm">
+        <canvas id="hud-rpm-canvas" width="110" height="110"></canvas>
+      </div>
+
+      <!-- Minimap -->
+      <div id="hud-minimap-wrap">
+        <canvas id="hud-minimap" width="130" height="130"></canvas>
+      </div>
+
+    </div><!-- #hud -->
+
+    <!-- Countdown -->
+    <div id="hud-countdown" class="hidden">
+      <div id="hud-countdown-num" class="countdown-num"></div>
+    </div>
+
+    <!-- Pause panel -->
+    <div id="pause-panel" class="hidden">
+      <div class="pause-box">
+        <h2>PAUSED</h2>
+        <div style="display:flex;flex-direction:column;gap:12px;min-width:220px;">
+          <button id="btn-resume"  class="btn primary">▶  RESUME</button>
+          <button id="btn-restart" class="btn">↺  RESTART</button>
+          <button id="btn-quit"    class="btn">✕  QUIT TO MENU</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Race-end panel -->
+    <div id="race-end-panel" class="hidden">
+      <div class="race-end-box">
+        <h2>RACE COMPLETE</h2>
+        <div id="race-stats"></div>
+        <div style="display:flex;gap:12px;margin-top:24px;justify-content:center;">
+          <button id="btn-race-restart" class="btn primary">↺  PLAY AGAIN</button>
+          <button id="btn-race-quit"    class="btn">✕  MENU</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- #screen-game -->
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SCRIPTS — order matters (no ES modules → global scope)
+  ════════════════════════════════════════════════════════════ -->
+  <script src="js/config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/track.js"></script>
+  <script src="js/vehicle.js"></script>
+  <script src="js/camera.js"></script>
+  <script src="js/effects.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/scoring.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/hud.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="js/game.js"></script>
+
+</body>
+</html>
