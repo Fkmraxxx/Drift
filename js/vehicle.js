@@ -145,9 +145,9 @@ class Vehicle {
        At very low speed the filter is bypassed to avoid division issues. */
     const relaxLen = C.tireRelaxLen || 0.14;
     const ds = Math.max(spd, 0.5) * dt;            // distance travelled this step
-    const relaxK = clamp(ds / relaxLen, 0, 1);      // blend factor (0=no change, 1=instant)
-    this._relaxFrontSlip += (rawFrontSlip - this._relaxFrontSlip) * relaxK;
-    this._relaxRearSlip  += (rawRearSlip  - this._relaxRearSlip)  * relaxK;
+    const relaxBlend = clamp(ds / relaxLen, 0, 1);   // 0 = no change, 1 = instant catch-up
+    this._relaxFrontSlip += (rawFrontSlip - this._relaxFrontSlip) * relaxBlend;
+    this._relaxRearSlip  += (rawRearSlip  - this._relaxRearSlip)  * relaxBlend;
 
     const frontSlip = this._relaxFrontSlip;
     const rearSlip  = this._relaxRearSlip;
@@ -244,10 +244,13 @@ class Vehicle {
     this.angularVel += (torque / C.inertia) * dt;
 
     /* Speed-dependent yaw damping: more damping at low speed (parking),
-       less artificial damping at high speed where tire forces dominate */
+       less artificial damping at high speed where tire forces dominate.
+       yawDampBase: baseline damping rate (/s) — always present to prevent spin-outs.
+       yawDampLow:  extra damping added at very low speed for parking stability.
+       The 0.15 divisor controls how quickly extra damping fades with speed. */
     const yawDampBase = 1.5;
-    const yawDampSpd  = 0.8;
-    const yawDamp = yawDampBase + yawDampSpd / (1 + spd * 0.15);
+    const yawDampLow  = 0.8;
+    const yawDamp = yawDampBase + yawDampLow / (1 + spd * 0.15);
     this.angularVel *= Math.max(0, 1 - yawDamp * dt);
 
     /* ── World forces ── */

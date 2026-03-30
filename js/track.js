@@ -241,7 +241,7 @@ const T4_CTRL = [
 ];
 
 /*  Track 5 — "Kart Circuit"
-    Professional karting circuit, tight technical layout, ~380 m, 9 m wide
+    Professional karting circuit, tight technical layout, ~790 m, 9 m wide
     Inspired by European GP karting tracks — many direction changes,
     tight hairpins, fast chicanes                                    */
 const T5_CTRL = [
