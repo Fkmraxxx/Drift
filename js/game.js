@@ -56,6 +56,9 @@
     car.spawn(track.startPos[0], track.startPos[1], track.startAngle);
     camera.snapTo(car.x, car.y, car.angle);
 
+    /* Auto headlights */
+    CFG.ENV.headlightsOn = (CFG.ENV.timeOfDay === 'night' || CFG.ENV.timeOfDay === 'dusk');
+
     _gameTime    = 0;
     _accumulator = 0;
     _prevNitro   = false;
