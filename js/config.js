@@ -123,4 +123,17 @@ const CFG = {
     rainSpeed: 440,   // px/s
     rainAngle: 0.2,   // rad
   },
+
+  /* ── 3D Renderer ─────────────────────────────────────────── */
+  RENDER3D: {
+    chaseCamBack:        8,     // meters behind car
+    chaseCamUp:          4,     // meters above car
+    chaseCamLookAhead:   5,     // meters ahead for lookAt target
+    chaseCamLerp:        0.08,  // camera follow smoothness
+    bodyRollFactor:      0.03,  // lateral G to roll angle
+    bodyPitchFactor:     0.015, // longitudinal G to pitch
+    wheelSpinFactor:     1.0,   // visual wheel spin multiplier
+    groundSize:          800,   // ground plane size
+    maxPixelRatio:       1.5,   // cap for low-end GPUs
+  },
 };

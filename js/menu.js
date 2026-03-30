@@ -187,6 +187,24 @@ const MenuManager = (() => {
       { v: 'wet',  l: '🌧 WET'  },
       { v: 'rain', l: '⛈ RAIN' },
     ], savedWx);
+
+    /* ── Render mode toggle ──────────────────────────────────── */
+    const savedRender = Storage.getSetting('render3d');
+    const renderVal   = savedRender === false ? 'false' : 'true';
+    const renderRow   = document.createElement('div');
+    renderRow.className = 'setting-row';
+    renderRow.innerHTML = `<label class="setting-label">RENDER MODE</label>
+      <div class="setting-control">
+        <select id="env-renderMode" class="setting-slider" style="background:#1a1e2e;color:#fff;border:1px solid #334;padding:4px 8px;font-family:inherit;">
+          <option value="true"${renderVal === 'true' ? ' selected' : ''}>🎮 3D MODE</option>
+          <option value="false"${renderVal === 'false' ? ' selected' : ''}>📺 2D CLASSIC</option>
+        </select>
+      </div>`;
+    grid.appendChild(renderRow);
+    renderRow.querySelector('select').addEventListener('change', (e) => {
+      const is3D = e.target.value === 'true';
+      Storage.setSetting('render3d', is3D);
+    });
   }
 
   /* ── Wire up all buttons ─────────────────────────────────── */
