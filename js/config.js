@@ -21,10 +21,17 @@ const CFG = {
     handbrakeGrip:    0.06,
     maxEngineForce:   6800,   // N
     maxBrakeForce:    11500,  // N
+    engineBrakeForce: 1200,   // N  engine braking when off throttle
     dragCoeff:        0.36,
     rollingResist:    80,
     downforceCoeff:   0.3,    // AE86 minimal aero
     maxSpeed:         52,     // m/s (~187 km/h)
+    /* Tire relaxation length — force builds up over distance, not instantly */
+    tireRelaxLen:     0.14,   // m  (lower = snappier, higher = smoother lag)
+    /* Load sensitivity — grip/N decreases as vertical load increases */
+    loadSensitivity:  0.00035,
+    /* Self-aligning torque (pneumatic trail) */
+    alignTorqueCoeff: 0.05,
     maxRPM:           8500,   // 4A-GE redline
     minRPM:           900,
     gearRatios:       [0, 3.587, 2.022, 1.384, 1.000, 0.861], // 5-speed
@@ -41,6 +48,7 @@ const CFG = {
     tireTempOptimal:  85,   // °C
     tireTempHeat:     14,   // °C/s when slipping hard
     tireTempCool:     3.5,  // °C/s cooling
+    tireTempGripMin:  0.65, // minimum grip fraction at extreme temps
   },
 
   /* ── Nitro / Boost ───────────────────────────────────────── */

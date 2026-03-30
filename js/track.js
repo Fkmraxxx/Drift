@@ -240,6 +240,36 @@ const T4_CTRL = [
   [ -2,   0],   // 24  Approach finish (closes loop)
 ];
 
+/*  Track 5 — "Kart Circuit"
+    Professional karting circuit, tight technical layout, ~380 m, 9 m wide
+    Inspired by European GP karting tracks — many direction changes,
+    tight hairpins, fast chicanes                                    */
+const T5_CTRL = [
+  [  0,   0],    //  0  Start / Finish
+  [ 55,   3],    //  1  Main straight
+  [105,  10],    //  2  End of straight
+  [145,  -5],    //  3  T1 right entry
+  [168, -38],    //  4  T1 right apex
+  [165, -72],    //  5  T1 exit
+  [140, -98],    //  6  Left hairpin entry
+  [105, -88],    //  7  Left hairpin apex
+  [100, -60],    //  8  Hairpin exit / chute
+  [120, -42],    //  9  Short link
+  [148, -52],    // 10  Right kink entry
+  [162, -82],    // 11  Right kink apex
+  [152,-115],    // 12  Kink exit
+  [125,-142],    // 13  S-curve left entry
+  [ 92,-155],    // 14  S-curve apex
+  [ 62,-142],    // 15  S-curve right
+  [ 42,-118],    // 16  Tight right hairpin entry
+  [ 28, -92],    // 17  Hairpin apex
+  [ 42, -68],    // 18  Hairpin exit
+  [ 30, -42],    // 19  Left sweep
+  [  8, -22],    // 20  Final chicane entry
+  [-10, -42],    // 21  Chicane mid
+  [ -8, -10],    // 22  Approach finish
+];
+
 /* ── Build & export ────────────────────────────────────────── */
 
 function makeTrack(id, name, ctrl, width, roadColor, accentColor, surface) {
@@ -263,4 +293,5 @@ const TRACKS = [
   makeTrack('industrial', 'Industrial Complex', T2_CTRL, 11, '#22201a', '#ff8800'),
   makeTrack('mountain',   'Mountain Pass',      T3_CTRL, 14, '#1a1e2a', '#cc44ff'),
   makeTrack('akina',      'Akina Touge',        T4_CTRL, 12, '#1a1810', '#e8b020'),
+  makeTrack('kart',       'Kart Circuit',       T5_CTRL,  9, '#2a2a2a', '#ff3333'),
 ];
